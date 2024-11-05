@@ -1,0 +1,291 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Ensure the body and html take full height */
+html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: white;
+    padding-bottom: 80px; /* Prevents content from overlapping the footer */
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-links a,
+.register-btn,
+.login-btn {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+}
+
+.register-btn {
+    background-color: black;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.login-btn {
+    background-color: #555;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.search-bar {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+/* Main Content Layout */
+.main-content {
+    display: flex;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    min-height: calc(100vh - 160px); /* Full height minus header and footer */
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Login Section - Left-Aligned Form */
+.login-section {
+    max-width: 400px;
+    text-align: left; /* Left-aligns the content */
+}
+
+.login-section h1 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.login-section .subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 20px;
+
+}
+
+
+.social-login {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.google-login,
+.facebook-login {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    background-color: #f9f9f9;
+    width: 180px;
+    text-align: center;
+}
+
+.google-login:hover,
+.facebook-login:hover {
+    background-color: #eee;
+}
+
+.login-section input[type="email"],
+.login-section input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.login-section button {
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-section button:hover {
+    background-color: #555;
+}
+
+.login-section .forgot-password {
+    font-size: 0.9rem;
+    color: #666;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Sign-Up Section - Centered Elements */
+.signup-section {
+    max-width: 400px;
+    text-align: center;
+}
+
+.signup-section h1 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.signup-section .subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.role-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.role-button {
+    padding: 10px 20px;
+    border: 1px solid #333;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+    width: 100px;
+    color: #333;
+    background-color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+.role-button.selected {
+    background-color: black;
+    color: white;
+}
+
+/* Image Section */
+.image-section img {
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-size: 0.9rem;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #333;
+    text-decoration: none;
+}
+
+/* Signup Page User */
+.signup-section {
+    max-width: 400px;
+    text-align: left; /* Align text to the left */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.signup-btn {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.social-login {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.social-login button {
+    width: 48%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.social-login button img {
+    width: 20px;
+    height: 20px;
+}
