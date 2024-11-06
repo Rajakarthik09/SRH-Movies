@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRH Movies</title>
+    <link rel="stylesheet" href="./css/profile_page.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">SRH <span>Movies</span></div>
+            <nav>
+                <a href="#">New Movie</a>
+                <a href="#">Genre</a>
+                <a href="#">Movie</a>
+                <a href="#">TV Series</a>
+                <input type="text" placeholder="Search...">
+                <button>See More</button>
+                <button>Welcome</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="profile">
+            <h2>Profile</h2>
+            <form>
+                <label>First name <input type="text" placeholder="Enter your first name"></label>
+                <label>Last name <input type="text" placeholder="Enter your last name"></label>
+                <label>Email <input type="email" placeholder="Enter your email address" readonly></label>
+                <label>Change password <input type="password" placeholder="Enter new password"></label>
+            </form>
+        </section>
+
+        <!-- Order History Table -->
+        <section class="order-history">
+            <h2>Order history</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SR No</th>
+                        <th>Movie name</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Seats</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Placeholder rows -->
+                    <tr>
+                        <td colspan="6" class="empty">No orders found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">Product</a>
+            <a href="#">Features</a>
+            <a href="#">Resources</a>
+            <span class="logo">LOGO</span>
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Support</a>
+        </div>
+        <p>&copy; 2010 - 2020 Privacy – Terms</p>
+    </footer>
+</body>
+</html>
