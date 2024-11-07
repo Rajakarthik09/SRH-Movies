@@ -16,7 +16,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "srhmovies123", // Replace with your MySQL password
+    password: "srhmovies123",
     database: "srh_movies"
 });
 
@@ -31,8 +31,6 @@ db.connect((err) => {
 // Endpoint for login
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
-
-    // Query to check if user exists in database
     const query = "SELECT * FROM users WHERE email = ? AND password = ?";
     db.query(query, [email, password], (err, results) => {
         if (err) {
@@ -48,7 +46,34 @@ app.post("/login", (req, res) => {
     });
 });
 
-// Start the server
+// Endpoint for sign-up user
+app.post("/signup_user", (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+
+    // Insert new user into the users table
+    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?,?)";
+    db.query(query, [firstName, lastName, email, password, 'F'], (err, result) => {
+        if (err) {
+            console.error("Database insertion error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+        res.json({ success: true, message: "User registered successfully" });
+    });
+});
+
+// Endpoint for sign-up seller
+app.post("/signup_seller", (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
+    db.query(query, [firstName, lastName, email, password, 'T'], (err, result) => {
+        if (err) {
+            console.error("Database insertion error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+        res.json({ success: true, message: "User registered successfully" });
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
