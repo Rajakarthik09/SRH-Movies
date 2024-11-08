@@ -5,18 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRH Movies</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="../css/Homeuser.css">
     <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Link Swiper's CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
 </head>
 <body>
     <!-- Navbar  -->
     <header>
         <a href="#home" class="logo">
-            <img src="./img/SRHlogo.png" alt=""></i>MOVIES
+            <img src="../img/SRHlogo.png" alt=""></i>MOVIES
         </a>
         <div class="bx bx-menu" id="menu-icon"></div>
 
@@ -34,11 +34,40 @@
                   
             </div>
         </ul>
+         
+        <div class="dropdown-wrapper">
+        <!--- Dropdown profile --->
+        <input type="checkbox" id="dropdown-toggle" class="dropdown-toggle">
+        <label for="dropdown-toggle" class="dropdown-label"></label>
 
-        <div class="navbtns">
-            <a href="#" class="btn" id="btns1">Register</a>
-            <a href="./html/HomeUser.html" class="btn" id="btns1">Login In</a>
+        <!--- Dropdown menu list items --->
+        <div class="dropdown-menu dropdown-menu--display">
+          <div class="upper-triangle"></div>
+          <ul class="dropdown-list">
+            <li>
+              <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+              <span>Profile</span>
+            </li>
+            <li>
+              <ion-icon name="mail-outline" class="dropdown-list-icon"></ion-icon>
+              <span>Inbox</span>
+            </li>
+            <li>
+              <ion-icon name="settings-outline" class="dropdown-list-icon"></ion-icon>
+              <span>Settings</span>
+            </li>
+            <li>
+              <ion-icon name="help-circle-outline" class="dropdown-list-icon"></ion-icon>
+              <span>Help</span>
+            </li>
+            <li>
+              <ion-icon name="log-out-outline" class="dropdown-list-icon"></ion-icon>
+              <span>Logout</span>
+            </li>
+          </ul>
         </div>
+      </div>
+        
 
     </header>
 
@@ -46,7 +75,7 @@
     <section class="home swiper" id="home">
         <div class="swiper-wrapper">
             <div class="swiper-slide container">
-                <img src="./img/Venom_img.png" alt="">
+                <img src="../img/Venom_img.png" alt="">
                 <div class="home-text">
                     <span>Marvel Universe</span>
                     <h1>Venom: The Last <br>Dance</h1>
@@ -57,7 +86,7 @@
                 </div>
             </div>
             <div class="swiper-slide container">
-                <img src="./img/batman.png" alt="">
+                <img src="../img/batman.png" alt="">
                 <div class="home-text">
                     <span>DC Extended Universe</span>
                     <h1>Zack Snyder’s <br> Justice
@@ -102,7 +131,7 @@
     <!-- footer  -->
     <section class="footer">
         <a href="" class="logo">
-            <img src="./img/SRHlogo2.png" alt=""></i>MOVIES
+            <img src="../img/SRHlogo2.png" alt=""></i>MOVIES
         </a>
         <div class="social">
             <a href=""><i class='bx bxl-facebook'></i></a>
@@ -119,6 +148,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/Server.js"></script>
 </body>
 </html>
