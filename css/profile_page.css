@@ -115,6 +115,13 @@ main {
     color: #888;
 }
 
+.login-btn {
+    background-color: lightblue;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
 /* Footer Styling */
 footer {
     background-color: #f8f8f8;
