@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRH Movies</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+</head>
+<body>
+    <!-- Navbar  -->
+    <header>
+        <a href="#home" class="logo">
+            <img src="./img/SRHlogo.png" alt=""></i>MOVIES
+        </a>
+        <div class="bx bx-menu" id="menu-icon"></div>
+
+        <!-- menu  -->
+        <ul class="navbar">
+            <li><a href="#home" class="home-active">Home</a></li>
+            <li><a href="#movies">Movies</a></li>
+            <li><a href="#coming">Genre</a></li>
+            <li><a href="#newsletter">About us</a></li>
+            <div class="box_nav">
+                <form name="search">
+                    <input type="text" class="input" name="txt" onmouseout="this.value = ''; this.blur();">
+                </form>
+                <i class="fa fa-search"></i>
+                  
+            </div>
+        </ul>
+
+        <div class="navbtns">
+            <a href="#" class="btn" id="btns1">Profile</a>
+            <a href="login_page.html" class="btn" id="btns1">Logout</a>
+        </div>
+
+    </header>
+
+    <!-- Home  -->
+    <section class="home swiper" id="home">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide container">
+                <img src="./img/Venom_img.png" alt="">
+                <div class="home-text">
+                    <span>Marvel Universe</span>
+                    <h1>Venom: The Last <br>Dance</h1>
+                    <a href="" class="btn">Book Now</a>
+                    <a href="https://youtu.be/__2bjWbetsA" class="play">
+                        <i class='bx bx-play' ></i>
+                    </a>
+                </div>
+            </div>
+            <div class="swiper-slide container">
+                <img src="./img/batman.png" alt="">
+                <div class="home-text">
+                    <span>DC Extended Universe</span>
+                    <h1>Zack Snyder’s <br> Justice
+                        League</h1>
+                    <a href="" class="btn">Book Now</a>
+                    <a href="https://youtu.be/ui37YKQ9AC4" class="play">
+                        <i class='bx bx-play' ></i>
+                    </a>
+                </div>
+            </div>
+            
+            
+          </div>
+          <div class="swiper-pagination"></div>
+    </section>
+
+    <!-- Movies  -->
+    <div class="movies" id="movies">
+        <h2 class="heading">Opening This Week</h2>
+        <!-- Movies container  -->
+        <div class="movies-container">
+            <h1>Currently Playing</h1>
+        </div>
+    </div>
+
+    <!-- coming  -->
+    <section class="coming" id="coming">
+        <h2 class="heading">Coming Soon</h2>
+        <!-- coming contanier  -->
+        <div class="coming-container swiper">
+           <h2>coming soon</h2> 
+        </div>
+        
+        
+    </section>
+
+    <!-- Newsletter /\ -->
+    <section class="newsletter" id="newsletter">
+        <h1>Newsletter</h1>
+    </section>
+
+    <!-- footer  -->
+    <section class="footer">
+        <a href="" class="logo">
+            <img src="./img/SRHlogo2.png" alt=""></i>MOVIES
+        </a>
+        <div class="social">
+            <a href=""><i class='bx bxl-facebook'></i></a>
+            <a href=""><i class='bx bxl-twitter'></i></a>
+            <a href=""><i class='bx bxl-instagram'></i></a>
+        </div>
+    </section>
+
+    <!-- Copyright  -->
+    <div class="copyright">
+        <p>&#169; SRH MOVIES All Right Reserved 2024.</p>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
