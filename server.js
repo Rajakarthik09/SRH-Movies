@@ -75,5 +75,66 @@ app.post("/signup_seller", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+    console.log(Server is running at http://localhost:${port});
+});
+
+// Endpoint to get bookings by email
+app.get('/get_bookings', (req, res) => {
+    const email = req.query.email;
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    // Query to fetch bookings by email
+    const query = 'SELECT * FROM bookings WHERE email = ?';
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        // If bookings found, return the data
+        if (results.length > 0) {
+            res.json({ success: true, bookings: results });
+        } else {
+            res.json({ success: false, message: 'No bookings found' });
+        }
+    });
+});
+
+// Endpoint to get bookings based on the user's email
+app.get('/get_bookings', (req, res) => {
+    const { email } = req.query;
+    const query = 'SELECT * FROM bookings WHERE email = ?';
+
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (results.length > 0) {
+            res.json({ success: true, bookings: results });
+        } else {
+            res.json({ success: false, message: 'No bookings found' });
+        }
+    });
+});
+// Endpoint to update user profile details
+app.put('/update_profile', (req, res) => {
+    const { email, firstName, lastName, password } = req.body;
+    const query = `
+        UPDATE users
+        SET first_name = ?, last_name = ?, password = ?
+        WHERE email = ?
+    `;
+    db.query(query, [firstName, lastName, password, email], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Profile updated successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
+    });
 });
