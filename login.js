@@ -1,25 +1,33 @@
-// Sample credentials for authentication
-const validEmail = "email@123";
-const validPassword = "password";
+// login.js
 
-// Handle form submission
-document.addEventListener("DOMContentLoaded", function() {
-    const loginForm = document.getElementById("loginForm");
+// Add event listener for form submission
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-    loginForm.addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent default form submission
+    // Capture email and password values from the form
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-        // Get email and password values
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    try {
+        // Send a POST request to the server with email and password
+        const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-        // Check if the email and password are correct
-        if (email === validEmail && password === validPassword) {
-            // Redirect to another page (e.g., dashboard.html)
-            window.location.href = "signup_page.html"; // Change this to your desired page
+        const result = await response.json();
+
+        if (result.success) {
+            window.location.href = "homepage_registered.html";
         } else {
-            // Alert the user of incorrect credentials
-            alert("Invalid email or password. Please try again.");
+            alert(result.message || "Invalid email or password.");
         }
-    });
+    } catch (error) {
+        // Log any errors in the console and show a general error message
+        console.error("Error:", error);
+        alert("An error occurred while attempting to log in. Please try again.");
+    }
 });
