@@ -106,7 +106,7 @@ app.get('/get_bookings', (req, res) => {
 // Endpoint to get bookings based on the user's email
 app.get('/get_bookings', (req, res) => {
     const { email } = req.query;
-    const query = 'SELECT * FROM bookings WHERE email = ?';
+    const query = 'SELECT * FROM movies WHERE email = ?';
 
     db.query(query, [email], (err, results) => {
         if (err) {
@@ -136,5 +136,61 @@ app.put('/update_profile', (req, res) => {
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
+    });
+});
+// Endpoint to fetch seller order history based on the seller's email
+app.get('/get_seller_orders', (req, res) => {
+    const { email } = req.query;
+    const query = `
+        SELECT * FROM movies
+        WHERE seller_email = ?
+    `;
+
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (results.length > 0) {
+            res.json({ success: true, orders: results });
+        } else {
+            res.json({ success: false, message: 'No orders found' });
+        }
+    });
+});
+
+// Endpoint to update seller profile details
+app.put('/update_seller_profile', (req, res) => {
+    const { email, firstName, lastName } = req.body;
+    const query = `
+        UPDATE sellers
+        SET first_name = ?, last_name = ?
+        WHERE email = ?
+    `;
+
+    db.query(query, [firstName, lastName, email], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Profile updated successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'Seller not found' });
+        }
+    });
+});
+
+// Endpoint to add a new movie
+app.post('/add_movie', (req, res) => {
+    const { movieName, movieDescription } = req.body;
+    const query = `
+        INSERT INTO movies (name, description)
+        VALUES (?, ?)
+    `;
+
+    db.query(query, [movieName, movieDescription], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        res.json({ success: true, message: 'Movie added successfully' });
     });
 });

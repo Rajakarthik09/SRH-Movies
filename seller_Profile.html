@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/seller_profile.css">
 </head>
 <body>
+    <!-- Header with Navigation -->
     <header>
         <div class="nav-container">
             <div class="logo">SRH <span>Movies</span></div>
@@ -21,37 +22,34 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main>
         <h1 class="centered-heading">Hi Seller. Welcome!</h1>
         <div class="content-container">
             <div class="form-section">
-                <form>
-                    <label>First name <span></span></label>
-                    <input type="text" placeholder="Enter your first name">
+                <!-- Profile Form -->
+                <form id="sellerProfileForm">
+                    <label>First name <input type="text" id="firstName" placeholder="Enter your first name"></label>
+                    <label>Last name <input type="text" id="lastName" placeholder="Enter your last name"></label>
+                    <label>Email <input type="email" id="sellerEmail" readonly></label>
+                    <button type="submit" class="save-changes">Save Changes</button>
+                </form>
 
-                    <label>Last name <span></span></label>
-                    <input type="text" placeholder="Enter your last name">
-
-                    <label>Email <span></span></label>
-                    <input type="email" readonly>
-
-                    <button type="button" class="save-changes">Save Changes</button>
-
+                <!-- Add Movie Form -->
+                <form id="addMovieForm">
                     <label>Movie</label>
-                    <input type="text" placeholder="Enter movie name">
-
+                    <input type="text" id="movieName" placeholder="Enter movie name">
                     <label>Description</label>
-                    <textarea placeholder="Enter movie description"></textarea>
-
-                    <button type="button" class="add-movie">Add Movie</button>
+                    <textarea id="movieDescription" placeholder="Enter movie description"></textarea>
+                    <button type="submit" class="add-movie">Add Movie</button>
                 </form>
             </div>
-
             <div class="image-placeholder">
-                <img src="" alt="img/batman.png">
+                <img src="img/avatar.jpg" alt="Image Placeholder">
             </div>
         </div>
 
+        <!-- Table Section -->
         <div class="table-section">
             <table>
                 <thead>
@@ -61,25 +59,16 @@
                         <th>Movie Name</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Seats</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Action</td>
-                        <td>Sample Movie</td>
-                        <td>12/11/2024</td>
-                        <td>7:00 PM</td>
-                        <td>50</td>
-                        <td>Available</td>
-                    </tr>
-                    </tbody>
+                <tbody id="orderHistoryTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                </tbody>
             </table>
         </div>
     </main>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <nav>
@@ -94,5 +83,78 @@
             <p>©️ 2010 – 2020 Privacy – Terms</p>
         </div>
     </footer>
+
+    <script>
+        // Retrieve and display seller's email on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            const email = localStorage.getItem("userEmail");
+            if (email) {
+                document.getElementById("sellerEmail").value = email;
+                fetchOrderHistory(email); // Fetch seller's order history
+            }
+        });
+
+        // Fetch and display order history
+        function fetchOrderHistory(email) {
+            fetch(`http://localhost:3000/get_seller_orders?email=${email}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('orderHistoryTableBody');
+                    tableBody.innerHTML = ''; // Clear previous rows
+
+                    if (data.success) {
+                        data.orders.forEach((order, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${order.category}</td>
+                                <td>${order.movie_name}</td>
+                                <td>${order.date}</td>
+                                <td>${order.time}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td colspan="7" class="empty">No orders found</td>`;
+                        tableBody.appendChild(row);
+                    }
+                })
+                .catch(error => console.error('Error fetching orders:', error));
+        }
+
+        // Update profile form submission
+        document.getElementById("sellerProfileForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const email = document.getElementById("sellerEmail").value;
+
+            fetch("http://localhost:3000/update_seller_profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ firstName, lastName, email })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.success ? "Profile updated successfully!" : "Failed to update profile"))
+            .catch(error => console.error("Error updating profile:", error));
+        });
+
+        // Add movie form submission
+        document.getElementById("addMovieForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const movieName = document.getElementById("movieName").value;
+            const movieDescription = document.getElementById("movieDescription").value;
+
+            fetch("http://localhost:3000/add_movie", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ movieName, movieDescription })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.success ? "Movie added successfully!" : "Failed to add movie"))
+            .catch(error => console.error("Error adding movie:", error));
+        });
+    </script>
 </body>
 </html>
