@@ -1,5 +1,3 @@
-// server.js
-
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
@@ -51,7 +49,7 @@ app.post("/signup_user", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     // Insert new user into the users table
-    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?,?)";
+    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
     db.query(query, [firstName, lastName, email, password, 'F'], (err, result) => {
         if (err) {
             console.error("Database insertion error:", err);
@@ -70,7 +68,97 @@ app.post("/signup_seller", (req, res) => {
             console.error("Database insertion error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
         }
-        res.json({ success: true, message: "User registered successfully" });
+        res.json({ success: true, message: "Seller registered successfully" });
+    });
+});
+
+// Endpoint to get bookings by email
+app.get('/get_bookings', (req, res) => {
+    const { email } = req.query;
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const query = 'SELECT * FROM bookings WHERE email = ?';
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, bookings: results });
+        } else {
+            res.json({ success: false, message: 'No bookings found' });
+        }
+    });
+});
+
+// Endpoint to update user profile details
+app.put('/update_profile', (req, res) => {
+    const { email, firstName, lastName, password } = req.body;
+    const query = `
+        UPDATE users
+        SET first_name = ?, last_name = ?, password = ?
+        WHERE email = ?
+    `;
+    db.query(query, [firstName, lastName, password, email], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Profile updated successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
+    });
+});
+
+// Endpoint to get movie details along with showtimes by name
+app.get('/get_movie', (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Movie name is required' });
+    }
+
+    const query = `
+        SELECT m.name, m.description, m.release_date, s.theater, s.time
+        FROM movies m
+        JOIN showtimes s ON m.id = s.movie_id
+        WHERE LOWER(m.name) = LOWER(?)
+    `;
+
+    db.query(query, [name], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (results.length > 0) {
+            const movie = {
+                name: results[0].name,
+                description: results[0].description,
+                release_date: results[0].release_date,
+                showtimes: []
+            };
+
+            // Group the showtimes by theater
+            results.forEach(row => {
+                const theaterIndex = movie.showtimes.findIndex(showtime => showtime.theater === row.theater);
+                if (theaterIndex === -1) {
+                    movie.showtimes.push({
+                        theater: row.theater,
+                        times: [row.time]
+                    });
+                } else {
+                    movie.showtimes[theaterIndex].times.push(row.time);
+                }
+            });
+
+            res.json({ success: true, movie });
+        } else {
+            res.json({ success: false, message: 'Movie not found' });
+        }
     });
 });
 

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRH Movies - Movie Details</title>
+    <link rel="stylesheet" href="./css/signup_style.css">
+    <style>
+        /* Inline CSS */
+        
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and Background */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #e74c3c;
+        }
+
+        .Venom {
+            width: 100%;
+            max-width: 800px; /* Restricts the maximum width */
+            height: auto; /* Maintains the image aspect ratio */
+            margin: 20px auto; /* Centers the image */
+            display: block;
+            border-radius: 8px; /* Adds rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow for depth */
+        }
+
+        .movie-description {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .movie-description p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .showtimes-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .showtimes-container div {
+            width: 45%;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .showtimes-container h2 {
+            font-size: 1.8em;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .theatre-name {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .showtime-list {
+            list-style: none;
+        }
+
+        .showtime-list li {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .showtime-list li a {
+            text-decoration: none;
+            color: inherit; /* Inherit color from the parent <li> */
+            display: block; /* Make the entire <li> clickable */
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .showtime-list li:hover {
+            background-color: #e74c3c;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.2em;
+            color: #777;
+        }
+
+        footer a {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <a href="signup_page.html" class="logo">SRH MOVIES</a>
+        <nav class="nav-links">
+            <a href="#">New Movie</a>
+            <a href="#">Genre</a>
+            <a href="#">Movie</a>
+            <a href="#">TV Series</a>
+            <input type="text" placeholder="Search..." class="search-bar">
+            <button class="login-btn">Logout</button>
+        </nav>
+    </header>
+
+    <!-- Movie Details Section -->
+    <header>
+        <h1 id="movie-title">Loading...</h1>
+        <img id="movie-image" class="Venom" src="./img/default.png" alt="Movie Image">
+    </header>
+
+    <section class="movie-description">
+        <p><strong>About the Movie:</strong></p>
+        <p id="movie-description">Loading description...</p>
+        <p><strong>Release Date:</strong> <span id="release-date">Loading...</span></p>
+    </section>
+
+    <div class="showtimes-container" id="showtimes-container">
+        <!-- Theaters and showtimes will be dynamically loaded here -->
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 SRH Movies. <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></p>
+    </footer>
+
+    <!-- Inline JavaScript to dynamically load movie details -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get movie name from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const movieName = urlParams.get('name');
+
+            if (movieName) {
+                fetchMovieDetails(movieName);
+            } else {
+                alert("No movie name specified!");
+            }
+        });
+
+        function fetchMovieDetails(name) {
+            fetch(`http://localhost:3000/get_movie?name=${encodeURIComponent(name)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayMovieDetails(data.movie, name);
+                    } else {
+                        alert("Movie not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching movie details:", error);
+                });
+        }
+
+        function displayMovieDetails(movie, movieName) {
+
+            document.getElementById("movie-title").textContent = movie.name;
+            document.getElementById("movie-description").textContent = movie.description;
+            document.getElementById("release-date").textContent = movie.release_date;
+
+            // Set dynamic image path based on lowercase movie name
+            const lowercaseName = movieName.toLowerCase().replace(/\s+/g, '_'); // Replace spaces with underscores
+            const imagePath = `./img/${lowercaseName}.png`; // Construct path to the image
+
+            // Attempt to load the image, if fails, fallback to default
+            const movieImage = document.getElementById("movie-image");
+            movieImage.onerror = function() {
+                // If image not found, use default image
+                movieImage.src = './img/default.png';
+            };
+            movieImage.src = imagePath;
+
+            // Display showtimes dynamically
+            const showtimesContainer = document.getElementById("showtimes-container");
+            showtimesContainer.innerHTML = ''; // Clear any existing content
+
+            // Assume movie.showtimes is an array of objects containing theater and time
+            movie.showtimes.forEach(showtime => {
+                const section = document.createElement("section");
+                section.classList.add("theatre-block");
+
+                section.innerHTML = `
+                    <h2>${showtime.theater}</h2>
+                    <div class="theatre-name">Showtimes:</div>
+                    <ul class="showtime-list">
+                        ${showtime.times.map(time => `<li><a href="seating_pattern.html">${time}</a></li>`).join('')}
+                    </ul>
+                `;
+                showtimesContainer.appendChild(section);
+            });
+        }
+    </script>
+</body>
+</html>
