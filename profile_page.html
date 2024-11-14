@@ -18,20 +18,21 @@
                 <a href="#">TV Series</a>
                 <input type="text" placeholder="Search...">
                 <button>See More</button>
-                <button>Welcome</button>
+                
             </nav>
         </div>
     </header>
 
     <!-- Main Content -->
     <main>
+        <!-- Profile Section -->
         <section class="profile">
             <h2>Profile</h2>
-            <form>
-                <label>First name <input type="text" placeholder="Enter your first name"></label>
-                <label>Last name <input type="text" placeholder="Enter your last name"></label>
-                <label>Email <input type="email" readonly></label>
-                <label>Change password <input type="password" placeholder="Enter new password"></label>
+            <form id="profileForm">
+                <label>First name <input type="text" id="firstName" placeholder="Enter your first name"></label>
+                <label>Last name <input type="text" id="lastName" placeholder="Enter your last name"></label>
+                <label>Email <input type="email" id="profileEmail" readonly></label>
+                <label>Change password <input type="password" id="password" placeholder="Enter new password"></label>
                 <button class="login-btn" type="submit">Save Changes</button>
             </form>
         </section>
@@ -44,17 +45,14 @@
                     <tr>
                         <th>SR No</th>
                         <th>Movie name</th>
-                        <th>Day</th>
+                        <th>Date</th>
                         <th>Time</th>
                         <th>Seats</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Placeholder rows -->
-                    <tr>
-                        <td colspan="6" class="empty">No orders found</td>
-                    </tr>
+                <tbody id="orderHistoryTableBody">
+                    <!-- Dynamic rows will be inserted here -->
                 </tbody>
             </table>
         </section>
@@ -73,5 +71,91 @@
         </div>
         <p>&copy; 2010 - 2020 Privacy – Terms</p>
     </footer>
+
+    <script>
+        // Retrieve the email from localStorage and display it on the profile page
+        document.addEventListener("DOMContentLoaded", function() {
+            const email = localStorage.getItem("userEmail");
+            if (email) {
+                document.getElementById("profileEmail").value = email;
+                // Fetch and display bookings based on the email
+                fetchBookings(email);
+            }
+        });
+
+        // Function to fetch bookings and update the order history table
+        function fetchBookings(email) {
+            fetch(`http://localhost:3000/get_bookings?email=${email}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('orderHistoryTableBody');
+                    tableBody.innerHTML = ''; // Clear previous rows
+
+                    if (data.success) {
+                        data.bookings.forEach((booking, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${booking.movie_name}</td>
+                                <td>${booking.date}</td>
+                                <td>${booking.time}</td>
+                                <td>${booking.seat_numbers}</td>
+                                <td>${booking.status}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td colspan="6" class="empty">No orders found</td>`;
+                        tableBody.appendChild(row);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching bookings:', error);
+                });
+        }
+
+        // Handle form submission to update profile
+        const profileForm = document.getElementById("profileForm");
+        profileForm.addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Get the updated profile data
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const password = document.getElementById("password").value;
+            const email = document.getElementById("profileEmail").value;
+
+            // Create an object with the updated data
+            const updatedData = {
+                firstName: firstName,
+                lastName: lastName,
+                password: password,
+                email: email,
+            };
+
+            // Send the updated data to the backend (PUT request)
+            fetch("http://localhost:3000/update_profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Profile updated successfully!");
+                        window.location.href = "login_page.html";
+                    } else {
+                        alert("Failed to update profile: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error updating profile:", error);
+                    alert("An error occurred while updating the profile.");
+                });
+        });
+    </script>
 </body>
 </html>
