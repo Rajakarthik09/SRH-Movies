@@ -68,6 +68,8 @@ h1 {
 
 .content-container {
     display: flex;
+    gap: 20px;
+    align-items: flex-start;
     justify-content: center;
     padding: 20px;
 }
@@ -83,7 +85,9 @@ h1 {
     margin-bottom: 5px;
 }
 
-.form-section input {
+.form-section input,
+.form-section textarea,
+.form-section select {
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -91,9 +95,9 @@ h1 {
     font-size: 14px;
 }
 
-.form-section .save-changes {
+.form-section .add-details {
     padding: 8px;
-    background-color: #02b331;
+    background-color: #007bff;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -101,12 +105,20 @@ h1 {
     margin-top: 10px;
 }
 
+.image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+}
+
 .table-section {
     width: 100%;
     max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    text-align: center;
+    margin: 20px auto;
 }
 
 table {
@@ -123,16 +135,6 @@ table th, table td {
 
 table th {
     background-color: #e0e0e0;
-}
-
-.add-movies {
-    padding: 8px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
 }
 
 footer {

@@ -3,56 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Dashboard</title>
+    <title>Seller Dashboard - SRH Movies</title>
     <link rel="stylesheet" href="./css/seller_profile.css">
 </head>
 <body>
+    <!-- Header -->
     <header>
         <div class="nav-container">
             <div class="logo">SRH <span>Movies</span></div>
             <nav>
-                <a href="#">New Movie</a>
-                <a href="#">Genre</a>
-                <a href="#">Movie</a>
-                <a href="#">TV Series</a>
-                <input type="text" placeholder="Search...">
-                <a href="index.html">Logout</a>
+                <button>Logout</button>
             </nav>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main>
-        <h1 class="centered-heading">Hi Seller. Welcome!</h1>
+        <h1>Hi Seller. Welcome!</h1>
         <div class="content-container">
+            <!-- Form Section -->
             <div class="form-section">
                 <form>
-                    <label>First name <span></span></label>
-                    <input type="text" placeholder="Enter your first name">
+                    <label>First name</label>
+                    <input type="text" id="firstName" placeholder="Enter your first name">
 
-                    <label>Last name <span></span></label>
-                    <input type="text" placeholder="Enter your last name">
+                    <label>Last name</label>
+                    <input type="text" id="lastName" placeholder="Enter your last name">
 
-                    <label>Email <span></span></label>
-                    <input type="email" readonly>
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" readonly >
 
-                    <button type="button" class="save-changes">Save Changes</button>
-
-                    <label>Movie</label>
-                    <input type="text" placeholder="Enter movie name">
-
-                    <label>Description</label>
-                    <textarea placeholder="Enter movie description"></textarea>
-
-                    <button type="button" class="add-movie">Add Movie</button>
+                    <button type="button" id="save_changes" class="save-changes">Save Changes</button>
                 </form>
-            </div>
-
-            <div class="image-placeholder">
-                <img src="" alt="img/batman.png">
             </div>
         </div>
 
-        <div class="table-section">
+        <!-- Table Section -->
+        <div class="table-section" id="movies-table">
             <table>
                 <thead>
                     <tr>
@@ -60,9 +47,6 @@
                         <th>Category</th>
                         <th>Movie Name</th>
                         <th>Date</th>
-                        <th>Time</th>
-                        <th>Seats</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,15 +55,21 @@
                         <td>Action</td>
                         <td>Sample Movie</td>
                         <td>12/11/2024</td>
-                        <td>7:00 PM</td>
-                        <td>50</td>
-                        <td>Available</td>
                     </tr>
-                    </tbody>
+                    <tr>
+                        <td>2</td>
+                        <td>Comedy</td>
+                        <td>Another Movie</td>
+                        <td>13/11/2024</td>
+                    </tr>
+                    <!-- Add more rows as needed -->
+                </tbody>
             </table>
+            <button type="button" class="add-movies" onclick="scrollToTable()">Add Movies</button>
         </div>
     </main>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <nav>
@@ -94,5 +84,94 @@
             <p>©️ 2010 – 2020 Privacy – Terms</p>
         </div>
     </footer>
+
+    <!-- JavaScript to Scroll to Table Section -->
+    <script>
+        function scrollToTable() {
+            document.getElementById('movies-table').scrollIntoView({ behavior: 'smooth' });
+        }
+    
+        // Retrieve the email from localStorage and display it on the profile page
+        document.addEventListener("DOMContentLoaded", function() {
+            const email = localStorage.getItem("userEmail");
+            if (email) {
+                document.getElementById("profileEmail").value = email;
+                // Fetch and display bookings based on the email
+                fetchBookings(email);
+            }
+        });
+
+        // Function to fetch bookings and update the order history table
+        function fetchBookings(email) {
+            fetch(http://localhost:3000/get_bookings?email=${email})
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('orderHistoryTableBody');
+                    tableBody.innerHTML = ''; // Clear previous rows
+
+                    if (data.success) {
+                        data.bookings.forEach((booking, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${booking.movie_name}</td>
+                                <td>${booking.date}</td>
+                                <td>${booking.time}</td>
+                                <td>${booking.seat_numbers}</td>
+                                <td>${booking.status}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = <td colspan="6" class="empty">No orders found</td>;
+                        tableBody.appendChild(row);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching bookings:', error);
+                });
+        }
+
+        // Handle form submission to update profile
+        const profileForm = document.getElementById("profileForm");
+        profileForm.addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Get the updated profile data
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const email = document.getElementById("profileEmail").value;
+
+            // Create an object with the updated data
+            const updatedData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+            };
+
+            // Send the updated data to the backend (PUT request)
+            fetch("http://localhost:3000/update_seller_profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Profile updated successfully!");
+                        window.location.href = "login_page.html";
+                    } else {
+                        alert("Failed to update profile: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error updating profile:", error);
+                    alert("An error occurred while updating the profile.");
+                });
+        });
+    </script>
 </body>
 </html>

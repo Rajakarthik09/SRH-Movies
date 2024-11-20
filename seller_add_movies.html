@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Movies - SRH Movies</title>
+    <link rel="stylesheet" href="./css/seller_add_movies.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">SRH <span>Movies</span></div>
+            <nav>
+                <button>Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <h1>Add Movies</h1>
+        <div class="content-container">
+            <!-- Form Section -->
+            <div class="form-section">
+                <form>
+                    <label>Movie Name</label>
+                    <input type="text" placeholder="Enter movie name">
+
+                    <label>Genre</label>
+                    <select name="genre">
+                        <option>Action</option>
+                        <option>Thriller</option>
+                        <option>Comedy</option>
+                        <option>Romance</option>
+                        <option>Horror</option>
+                    </select>
+
+                    <label>Description</label>
+                    <textarea placeholder="Enter movie description"></textarea>
+
+                    <label>Release Date</label>
+                    <input type="text" placeholder="DD/MM/YYYY">
+
+                    <label>Theater</label>
+                    <select name="theater">
+                        <option>SRH Leipzig Theatre</option>
+                        <option>SRH Berlin Theatre</option>
+                    </select>
+
+                    <label>Show Time</label>
+                    <select name="show-time">
+                        <option>13:00 </option>
+                        <option>16:00 </option>
+                        <option>21:00 </option>
+                    </select>
+
+                    <label>Day</label>
+                    <select name="day">
+                        <option>Monday</option>
+                        <option>Tuesday</option>
+                        <option>Wednesday</option>
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                        <option>Sunday</option>
+                    </select>
+
+                    <button type="button" class="add-details">Add Details</button>
+                </form>
+            </div>
+
+            <!-- Image Section -->
+            <div class="image-placeholder">
+                <img src="" alt="Image Placeholder">
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Movie Name</th>
+                        <th>Genre</th>
+                        <th>Description</th>
+                        <th>Release Date</th>
+                        <th>Theater</th>
+                        <th>Show Time</th>
+                        <th>Day</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Sample Movie</td>
+                        <td>Action</td>
+                        <td>A sample description</td>
+                        <td>12/11/2024</td>
+                        <td>SRH Leipzig</td>
+                        <td>1:00 PM</td>
+                        <td>Monday</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <nav>
+                <a href="#">Product</a>
+                <a href="#">Features</a>
+                <a href="#">Resources</a>
+                <a href="#">About</a>
+                <a href="#">Blog</a>
+                <a href="#">Support</a>
+            </nav>
+            <div class="logo-text">LOGO</div>
+            <p>©️ 2010 – 2020 Privacy – Terms</p>
+        </div>
+    </footer>
+</body>
+</html>
