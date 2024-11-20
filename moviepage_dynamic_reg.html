@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-links a,
+.register-btn,
+.login-btn {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+}
+
+.register-btn {
+    background-color: black;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.login-btn {
+    background-color: #555;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.search-bar {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        #movie-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #movie-container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        #movie-title {
+            font-size: 2.5em;
+            color: #dc3545;
+        }
+        #movie-description, #release-date {
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        #showtimes-container {
+            margin-top: 30px;
+        }
+        .day-container {
+            background-color: #ffffff;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .day-container h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        .theater-container {
+            margin-top: 10px;
+        }
+        .theater-container h4 {
+            color: #343a40;
+        }
+        .times-container {
+            margin-top: 5px;
+        }
+        .time {
+            display: inline-block;
+            background-color: #ffc107;
+            color: #212529;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">SRH MOVIES</a>
+        <nav class="nav-links">
+            <a href="#">New Movie</a>
+            <a href="#">Genre</a>
+            <a href="#">Movie</a>
+            <a href="#">TV Series</a>
+            <input type="text" placeholder="Search..." class="search-bar">
+            <a href="signup_page.html" class="register-btn">Register</a>
+        </nav>
+    </header>
+    
+    <div id="movie-container">
+        <img id="movie-poster" src="img/default.png" alt="Movie Poster">
+        <h1 id="movie-title">Movie Title</h1>
+        <p id="movie-description">Movie Description</p>
+        <p id="release-date">Release Date</p>
+    </div>
+    <div id="showtimes-container"></div>
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 SRH Movies. <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get movie name from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const movieName = urlParams.get('name');
+
+            if (movieName) {
+                fetchMovieDetails(movieName);
+            } else {
+                alert("No movie name specified!");
+            }
+        });
+
+        function fetchMovieDetails(name) {
+            fetch(`http://localhost:3000/get_movie?name=${encodeURIComponent(name)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderMovieDetails(data);
+                    } else {
+                        alert("Movie not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching movie details:", error);
+                });
+        }
+
+        // Function to render movie details and showtimes
+        function renderMovieDetails(data) {
+            const movie = data.movie;
+
+            // Set movie title, description, release date, and poster
+            document.getElementById('movie-title').textContent = movie.name;
+            document.getElementById('movie-description').textContent = movie.description;
+            document.getElementById('release-date').textContent = `Release Date: ${new Date(movie.release_date).toDateString()}`;
+
+            // Set poster if available (fallback to default)
+            const posterUrl = `img/${movie.name.toLowerCase().replace(/\s/g, '_')}.png`;
+            const posterElement = document.getElementById('movie-poster');
+            posterElement.src = posterUrl;
+            posterElement.onerror = () => posterElement.src = 'img/default.png';
+
+            // Render showtimes
+            const showtimesContainer = document.getElementById('showtimes-container');
+            showtimesContainer.innerHTML = ''; // Clear previous content
+
+            movie.showtimes.forEach(dayEntry => {
+                // Create day container
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day-container');
+
+                const dayHeading = document.createElement('h3');
+                dayHeading.textContent = dayEntry.day;
+                dayDiv.appendChild(dayHeading);
+
+                // Add theaters and their times for the day
+                dayEntry.theaters.forEach(theater => {
+                    const theaterDiv = document.createElement('div');
+                    theaterDiv.classList.add('theater-container');
+
+                    const theaterName = document.createElement('h4');
+                    theaterName.textContent = theater.name;
+                    theaterDiv.appendChild(theaterName);
+
+                    const timesDiv = document.createElement('div');
+                    timesDiv.classList.add('times-container');
+
+                    // Add each showtime
+                    theater.times.forEach(time => {
+                        const timeLink = document.createElement('a');
+                        timeLink.textContent = time;
+                        timeLink.href = `seating.html`;
+                        timeLink.classList.add('time');
+                        timesDiv.appendChild(timeLink);
+                    });
+
+                    theaterDiv.appendChild(timesDiv);
+                    dayDiv.appendChild(theaterDiv);
+                });
+
+                showtimesContainer.appendChild(dayDiv);
+            });
+        }
+    </script>
+</body>
+</html>
