@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Movies</title>
+  <link rel="stylesheet" href="css\seller_edit_profile.css">
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo">SRH MOVIES</div>
+    <nav>
+      <a href="#">New Movie</a>
+      <a href="#">My Tickets</a>
+      <a href="#">Movie</a>
+      <a href="#">TV Series</a>
+    </nav>
+    <div class="auth-buttons">
+      <button class="logout">Logout</button>
+    </div>
+  </header>
+
+  <!-- Edit Movies Form Section -->
+  <section class="edit-movies">
+    <h1>Edit Movies</h1>
+    <form class="movie-form">
+      <label for="movie-name">Movie Name</label>
+      <input type="text" id="movie-name" placeholder="Enter movie name">
+
+      <label for="genre">Genre</label>
+      <select id="genre">
+        <option>Select Genre</option>
+      </select>
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="Enter description"></textarea>
+
+      <label for="release-date">Release Date</label>
+      <input type="date" id="release-date">
+
+      <label for="theater">Theater</label>
+      <select id="theater">
+        <option>Select Theater</option>
+      </select>
+
+      <label for="show-time">Show Time</label>
+      <input type="time" id="show-time">
+
+      <label for="day">Day</label>
+      <select id="day">
+        <option>Select Day</option>
+      </select>
+
+      <button type="button" class="add-details">Add Details</button>
+    </form>
+    <div class="image-placeholder">
+      <img src="https://via.placeholder.com/150" alt="Placeholder Image">
+    </div>
+  </section>
+
+  <!-- Movies Table Section -->
+  <section class="movies-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Sr. No</th>
+          <th>Movie Name</th>
+          <th>Genre</th>
+          <th>Description</th>
+          <th>Release Date</th>
+          <th>Theatre</th>
+          <th>Show Time</th>
+          <th>Day</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows can be added here -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">Product</a>
+      <a href="#">Features</a>
+      <a href="#">Resources</a>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="#">Support</a>
+    </div>
+    <div class="footer-logo">LOGO</div>
+    <p>&copy; 2019 - 2020 Privacy - Terms</p>
+  </footer>
+
+</body>
+</html>
