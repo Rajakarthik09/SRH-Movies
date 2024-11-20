@@ -125,7 +125,7 @@
 <body>
     <!-- Header Section -->
     <header class="header">
-        <a href="index.html" class="logo">SRH MOVIES</a>
+        <a href="HomeUser.html" class="logo">SRH MOVIES</a>
         <nav class="nav-links">
             <a href="#">New Movie</a>
             <a href="#">Genre</a>
@@ -217,7 +217,7 @@
                     <h2>${showtime.theater}</h2>
                     <div class="theatre-name">Showtimes:</div>
                     <ul class="showtime-list">
-                        ${showtime.times.map(time => `<li><a href="">${time}</a></li>`).join('')}
+                        ${showtime.times.map(time => `<li><a href="seating.html">${time}</a></li>`).join('')}
                     </ul>
                 `;
                 showtimesContainer.appendChild(section);
