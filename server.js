@@ -124,7 +124,7 @@ app.get('/get_movie', (req, res) => {
     }
 
     const query = `
-        SELECT m.name, m.description, m.release_date, s.theater, s.time
+        SELECT m.name, m.description, m.release_date, s.theater, s.time, s.day
         FROM movies m
         JOIN showtimes s ON m.id = s.movie_id
         WHERE LOWER(m.name) = LOWER(?)
@@ -134,7 +134,9 @@ app.get('/get_movie', (req, res) => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Database error' });
         }
+
         if (results.length > 0) {
+            // Structure the response
             const movie = {
                 name: results[0].name,
                 description: results[0].description,
@@ -142,17 +144,32 @@ app.get('/get_movie', (req, res) => {
                 showtimes: []
             };
 
-            // Group the showtimes by theater
+            // Group showtimes by day
             results.forEach(row => {
-                const theaterIndex = movie.showtimes.findIndex(showtime => showtime.theater === row.theater);
-                if (theaterIndex === -1) {
-                    movie.showtimes.push({
-                        theater: row.theater,
-                        times: [row.time]
-                    });
-                } else {
-                    movie.showtimes[theaterIndex].times.push(row.time);
+                // Check if the day already exists
+                let dayEntry = movie.showtimes.find(showtime => showtime.day === row.day);
+                if (!dayEntry) {
+                    // If the day doesn't exist, create a new day entry
+                    dayEntry = {
+                        day: row.day,
+                        theaters: []
+                    };
+                    movie.showtimes.push(dayEntry);
                 }
+
+                // Check if the theater exists under the current day
+                let theaterEntry = dayEntry.theaters.find(theater => theater.name === row.theater);
+                if (!theaterEntry) {
+                    // If the theater doesn't exist, create a new theater entry
+                    theaterEntry = {
+                        name: row.theater,
+                        times: []
+                    };
+                    dayEntry.theaters.push(theaterEntry);
+                }
+
+                // Add the time to the theater entry
+                theaterEntry.times.push(row.time);
             });
 
             res.json({ success: true, movie });

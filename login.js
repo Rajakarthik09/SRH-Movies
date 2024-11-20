@@ -22,6 +22,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
 
         if (result.success) {
             window.location.href = "HomeUser.html";
+            localStorage.setItem("userEmail", email);
         } else {
             alert(result.message || "Invalid email or password.");
         }
