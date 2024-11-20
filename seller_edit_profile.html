@@ -9,57 +9,61 @@
 <body>
 
   <!-- Header Section -->
-  <header>
-    <div class="logo">SRH MOVIES</div>
-    <nav>
-      <a href="#">New Movie</a>
-      <a href="#">My Tickets</a>
-      <a href="#">Movie</a>
-      <a href="#">TV Series</a>
+  <header class="header">
+    <a href="index.html" class="logo">SRH MOVIES</a>
+    <nav class="nav-links">
+        <a href="#">New Movie</a>
+        <a href="#">Genre</a>
+        <a href="#">Movie</a>
+        <a href="#">TV Series</a>
+        <input type="text" placeholder="Search..." class="search-bar">
+        <a href="index.html" class="register-btn">Logout</a>
     </nav>
-    <div class="auth-buttons">
-      <button class="logout">Logout</button>
-    </div>
-  </header>
+</header>
 
   <!-- Edit Movies Form Section -->
   <section class="edit-movies">
     <h1>Edit Movies</h1>
     <form class="movie-form">
       <label for="movie-name">Movie Name</label>
-      <input type="text" id="movie-name" placeholder="Enter movie name">
-
+      <input type="text" id="movie-name" placeholder="Enter movie name" readonly>
+    
       <label for="genre">Genre</label>
       <select id="genre">
-        <option>Select Genre</option>
+        <option>Action</option>
+        <option>Drama</option>
+        <option>Comedy</option>
+        <option>Horror</option>
       </select>
-
+    
       <label for="description">Description</label>
       <textarea id="description" placeholder="Enter description"></textarea>
-
+    
       <label for="release-date">Release Date</label>
       <input type="date" id="release-date">
-
+    
       <label for="theater">Theater</label>
       <select id="theater">
-        <option>Select Theater</option>
+        <option>SRH Leipzig Theater</option>
+        <option>SRH Berlin Theater</option>
       </select>
-
+    
       <label for="show-time">Show Time</label>
-      <input type="time" id="show-time">
-
+      <input type="time" id="show-time" value="12:00">
+    
       <label for="day">Day</label>
       <select id="day">
-        <option>Select Day</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
       </select>
-
-      <button type="button" class="add-details">Add Details</button>
+    
+      <button type="button" class="add-details">Save Changes</button>
     </form>
-    <div class="image-placeholder">
-      <img src="https://via.placeholder.com/150" alt="Placeholder Image">
-    </div>
-  </section>
-
   <!-- Movies Table Section -->
   <section class="movies-table">
     <table>
@@ -81,6 +85,7 @@
       </tbody>
     </table>
   </section>
+  </section>
 
   <!-- Footer Section -->
   <footer>
@@ -95,6 +100,40 @@
     <div class="footer-logo">LOGO</div>
     <p>&copy; 2019 - 2020 Privacy - Terms</p>
   </footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get movie name from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const movieName = urlParams.get('name');
 
+      if (movieName) {
+          fetchMovieDetails(movieName);
+      } else {
+          alert("No movie name specified!");
+      }
+    });
+
+    function fetchMovieDetails(name) {
+      fetch(`http://localhost:3000/get_movie?name=${encodeURIComponent(name)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            renderMovieDetails(data.movie);
+          } else {
+            alert("Movie not found.");
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching movie details:", error);
+        });
+    }
+
+    // Function to render movie details
+    function renderMovieDetails(movie) {
+      document.getElementById('movie-name').value = movie.name;
+      document.getElementById('description').value = movie.description;
+      document.getElementById('release-date').value = movie.release_date;
+    }
+  </script>
 </body>
 </html>

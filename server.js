@@ -182,3 +182,37 @@ app.get('/get_movie', (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
+
+// Endpoint to get movie details, genres, and showtimes by name
+app.get('/get_movie_details', (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Movie name is required' });
+    }
+
+    // Query to get movie details, genres, and showtimes
+    const query = `
+        SELECT m.name, m.description, m.release_date
+        FROM movies m
+        WHERE LOWER(m.name) = LOWER(?)
+    `;
+
+    db.query(query, [name], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            // Structure the response
+            const movie = {
+                name: results[0].name,
+                description: results[0].description,
+                release_date: results[0].release_date,
+            };
+            res.json({ success: true, movie });
+        } else {
+            res.json({ success: false, message: 'Movie not found' });
+        }
+    });
+});
