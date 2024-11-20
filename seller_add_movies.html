@@ -23,12 +23,12 @@
         <div class="content-container">
             <!-- Form Section -->
             <div class="form-section">
-                <form>
+                <form id="movieForm">
                     <label>Movie Name</label>
-                    <input type="text" placeholder="Enter movie name">
+                    <input type="text" id="movieName" placeholder="Enter movie name" required>
 
                     <label>Genre</label>
-                    <select name="genre">
+                    <select id="genre" name="genre">
                         <option>Action</option>
                         <option>Thriller</option>
                         <option>Comedy</option>
@@ -37,26 +37,26 @@
                     </select>
 
                     <label>Description</label>
-                    <textarea placeholder="Enter movie description"></textarea>
+                    <textarea id="description" placeholder="Enter movie description" required></textarea>
 
                     <label>Release Date</label>
-                    <input type="text" placeholder="DD/MM/YYYY">
+                    <input type="text" id="releaseDate" placeholder="DD/MM/YYYY" required>
 
                     <label>Theater</label>
-                    <select name="theater">
+                    <select id="theater" name="theater">
                         <option>SRH Leipzig Theatre</option>
                         <option>SRH Berlin Theatre</option>
                     </select>
 
                     <label>Show Time</label>
-                    <select name="show-time">
-                        <option>13:00 </option>
-                        <option>16:00 </option>
-                        <option>21:00 </option>
+                    <select id="showTime" name="show-time">
+                        <option>13:00</option>
+                        <option>16:00</option>
+                        <option>21:00</option>
                     </select>
 
                     <label>Day</label>
-                    <select name="day">
+                    <select id="day" name="day">
                         <option>Monday</option>
                         <option>Tuesday</option>
                         <option>Wednesday</option>
@@ -66,19 +66,14 @@
                         <option>Sunday</option>
                     </select>
 
-                    <button type="button" class="add-details">Add Details</button>
+                    <button type="button" id="addMovieButton">Add Details</button>
                 </form>
-            </div>
-
-            <!-- Image Section -->
-            <div class="image-placeholder">
-                <img src="" alt="Image Placeholder">
             </div>
         </div>
 
         <!-- Table Section -->
         <div class="table-section">
-            <table>
+            <table id="movieTable">
                 <thead>
                     <tr>
                         <th>Sr. No</th>
@@ -92,18 +87,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Sample Movie</td>
-                        <td>Action</td>
-                        <td>A sample description</td>
-                        <td>12/11/2024</td>
-                        <td>SRH Leipzig</td>
-                        <td>1:00 PM</td>
-                        <td>Monday</td>
-                    </tr>
+                    <!-- Dynamic rows will be added here -->
                 </tbody>
             </table>
+            <button type="button" id="saveChangesButton">Save Changes</button>
         </div>
     </main>
 
@@ -122,5 +109,92 @@
             <p>©️ 2010 – 2020 Privacy – Terms</p>
         </div>
     </footer>
+
+    <!-- Inline JavaScript -->
+    <script>
+        const movieTableBody = document.querySelector("#movieTable tbody");
+        const addMovieButton = document.getElementById("addMovieButton");
+        const saveChangesButton = document.getElementById("saveChangesButton");
+
+        let movieList = [];
+        let movieCounter = 1;
+
+        addMovieButton.addEventListener("click", () => {
+            const movieName = document.getElementById("movieName").value;
+            const genre = document.getElementById("genre").value;
+            const description = document.getElementById("description").value;
+            let releaseDate = document.getElementById("releaseDate").value;
+            const theater = document.getElementById("theater").value;
+            const showTime = document.getElementById("showTime").value;
+            const days = document.getElementById("day").value;
+
+            if (!movieName || !description || !releaseDate) {
+                alert("Please fill out all required fields.");
+                return;
+            }
+
+            // Convert releaseDate to YYYY-MM-DD format
+            const [day, month, year] = releaseDate.split("/");
+            releaseDate = `${year}-${month}-${day}`;
+
+            const movieData = {
+                id: movieCounter,
+                movieName,
+                genre,
+                description,
+                releaseDate,
+                theater,
+                showTime,
+                days
+            };
+
+            movieList.push(movieData);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${movieCounter}</td>
+                <td>${movieName}</td>
+                <td>${genre}</td>
+                <td>${description}</td>
+                <td>${releaseDate}</td>
+                <td>${theater}</td>
+                <td>${showTime}</td>
+                <td>${days}</td>
+            `;
+            movieTableBody.appendChild(row);
+
+            movieCounter++;
+            document.getElementById("movieForm").reset();
+        });
+
+        // Save all movies to backend
+        saveChangesButton.addEventListener("click", () => {
+            if (movieList.length === 0) {
+                alert("No movies to save!");
+                return;
+            }
+            console.log(movieList)
+            fetch("http://localhost:3000/add_movies", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ movies: movieList }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert("Movies saved successfully!");
+                        movieList = []; // Clear the local list
+                    } else {
+                        alert("Failed to save movies: " + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error saving movies:", error);
+                    alert("An error occurred while saving the movies.");
+                });
+        });
+    </script>
 </body>
 </html>

@@ -81,6 +81,21 @@
                 document.getElementById("profileEmail").value = email;
                 // Fetch and display bookings based on the email
                 fetchBookings(email);
+                fetch(`http://localhost:3000/get_user_info?email=${email}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const {first_name, last_name} = data.details[0];
+                        document.getElementById("firstName").value = first_name;
+                        document.getElementById("lastName").value = last_name;
+                    } else {
+                        alert("Failed to fetch details: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching details:", error);
+                    alert("An error occurred while fetching the profile info.");
+                });
             }
         });
 
