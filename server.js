@@ -16,7 +16,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "srhmovies123",
+    password: "root1",
     database: "srh_movies"
 });
 
@@ -61,24 +61,50 @@ app.post("/signup_user", (req, res) => {
     });
 });
 
-// Endpoint for sign-up seller
+// Endpoint for adding a seller (sign-up)
 app.post("/signup_seller", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
     db.query(query, [firstName, lastName, email, password, 'T'], (err, result) => {
-        if (err) {
-            console.error("Database insertion error:", err);
-            return res.status(500).json({ success: false, message: "Database error" });
-        }
-        res.json({ success: true, message: "User registered successfully" });
+      if (err) {
+        console.error("Database insertion error:", err);
+        return res.status(500).json({ success: false, message: "Database error" });
+      }
+      res.json({ success: true, message: "Seller added successfully" });
     });
-});
-
+  });
+  
+  // Endpoint for fetching all sellers from the database
+  app.get("/get_sellers", (req, res) => {
+    const query = "SELECT * FROM users WHERE seller = 'T'";
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Database fetch error:", err);
+        return res.status(500).json({ success: false, message: "Database error" });
+      }
+      res.json({ success: true, data: results });
+    });
+  });
+  
+  app.delete('/delete_seller', (req, res) => {
+    const { sellerId } = req.body; // Get seller ID from the request body
+    const query = 'DELETE FROM users WHERE id = ? AND seller = "T"';
+    db.query(query, [sellerId], (err, result) => {
+        if (err) {
+            console.error('Error deleting seller:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Seller not found' });
+        }
+        res.json({ success: true, message: 'Seller deleted successfully' });
+    });
+});  
 app.listen(port, () => {
-    console.log(Server is running at http://localhost:${port});
+    console.log(`Server is running at http://localhost:${port}`);
 });
 
-// Endpoint to get bookings by email
+// Endpoint to get bookings by email`
 app.get('/get_bookings', (req, res) => {
     const email = req.query.email;
 
