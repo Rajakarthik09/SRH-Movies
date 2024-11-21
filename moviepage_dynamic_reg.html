@@ -215,7 +215,7 @@
                     theater.times.forEach(time => {
                         const timeLink = document.createElement('a');
                         timeLink.textContent = time;
-                        timeLink.href = `seating.html`;
+                        timeLink.href = `seating.html?name=${movie.name}&time=${time}&theater=${theater.name}&day=${dayEntry.day}`;
                         timeLink.classList.add('time');
                         timesDiv.appendChild(timeLink);
                     });

@@ -173,6 +173,36 @@ app.get('/get_user_info', (req, res) => {
         }
     });
 });
+//Endpoint for getting movie details in edit page
+app.get('/get_movie_details', (req, res) => {
+    const { id } = req.query; // Use `req.query` to fetch query parameters in a GET request.
+
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Movie ID not found' });
+    }
+
+    const query = `
+        SELECT m.name,m.genre,m.description,m.release_date,s.theater,s.time,s.day
+        FROM movies m
+        LEFT JOIN 
+        showtimes s ON m.id = s.movie_id
+        WHERE 
+        m.id = ?;
+    `;
+
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, data: results });
+        } else {
+            res.status(404).json({ success: false, message: 'Id not found' });
+        }
+    });
+});
 
 // Endpoint to get movie details along with showtimes by name
 app.get('/get_movie', (req, res) => {
@@ -287,6 +317,81 @@ app.post("/add_movies", (req, res) => {
         });
 });
 
+app.get('/get_booked_seats', (req, res) => {
+    const { name, time, theater, day } = req.query;
+
+    if (!name || !time || !theater || !day) {
+        return res.status(400).json({ success: false, message: 'Missing required parameters' });
+    }
+
+    const query = `
+        SELECT seat_numbers
+        FROM bookings
+        WHERE movie_name = ? AND time = ? AND theater = ? AND day = ? AND status = 'Confirmed';
+    `;
+
+    db.query(query, [name, time, theater, day], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            // Aggregate all booked seats
+            const bookedSeats = results.reduce((acc, row) => {
+                // If seat_numbers is a string, split it into an array
+                let seats;
+                if (typeof row.seat_numbers === 'string') {
+                    seats = row.seat_numbers.split(',');  // Split string into array
+                } else if (Array.isArray(row.seat_numbers)) {
+                    seats = row.seat_numbers;  // It's already an array
+                } else {
+                    console.warn(`Unexpected seat_numbers format for row: ${JSON.stringify(row)}`);
+                    seats = []; // Default to an empty array if something is wrong
+                }
+    
+                seats.forEach(seat => {
+                    const rowLetter = seat.charAt(0);  // Extract row (e.g., 'A' from 'A1')
+                    const seatNumber = parseInt(seat.slice(1), 10);  // Extract seat number (e.g., 1 from 'A1')
+    
+                    // Initialize row in acc if it doesn't exist
+                    if (!acc[rowLetter]) acc[rowLetter] = [];
+                    acc[rowLetter].push(seatNumber);
+                });
+                return acc;
+            }, {});
+    
+            res.json({ success: true, bookedSeats });
+        } else {
+            res.json({ success: true, bookedSeats: {} }); // No seats booked
+        }
+    });
+});
+
+app.post('/book_seat', (req, res) => {
+    const { email, movie_name, time, theater, day, seat_numbers, status } = req.body;
+
+    // Check if all required data is provided
+    if (!email || !movie_name || !time || !theater || !day || !seat_numbers || !status) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Insert the booking into the database
+    const query = `
+        INSERT INTO bookings (email, movie_name, day, time, seat_numbers, status, theater)
+        VALUES (?, ?, ?, ?, ?, ?, ?);
+    `;
+    const values = [email, movie_name, day, time, JSON.stringify(seat_numbers), status, theater];
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        res.json({ success: true, message: 'Booking successful' });
+    });
+});
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

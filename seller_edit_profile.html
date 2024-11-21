@@ -38,7 +38,7 @@
       <textarea id="description" placeholder="Enter description"></textarea>
 
       <label for="release-date">Release Date</label>
-      <input type="date" id="release-date">
+      <input type="text" id="release-date">
 
       <label for="theater">Theater</label>
       <select id="theater">
@@ -46,7 +46,7 @@
       </select>
 
       <label for="show-time">Show Time</label>
-      <input type="time" id="show-time">
+      <input type="text" id="show-time">
 
       <label for="day">Day</label>
       <select id="day">
@@ -55,10 +55,6 @@
 
       <button type="button" class="add-details">Add Details</button>
     </form>
-    <div class="image-placeholder">
-      <img src="https://via.placeholder.com/150" alt="Placeholder Image">
-    </div>
-  </section>
 
   <!-- Movies Table Section -->
   <section class="movies-table">
@@ -80,6 +76,7 @@
         <!-- Rows can be added here -->
       </tbody>
     </table>
+    </section>
   </section>
 
   <!-- Footer Section -->
@@ -95,6 +92,36 @@
     <div class="footer-logo">LOGO</div>
     <p>&copy; 2019 - 2020 Privacy - Terms</p>
   </footer>
+  <script>
+    // Fetch Movie Details on Page Load
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
+    console.log(movieId)
 
+    if (movieId) {
+        fetch(`http://localhost:3000/get_movie_details?id=${movieId}`)
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                // Populate the form with movie details
+                document.getElementById('movie-name').value = data.name;
+                document.getElementById('genre').value = data.genre;
+                document.getElementById('description').value = data.description;
+                document.getElementById('release-date').value = data.release_date;
+                document.getElementById('theater').value = data.theater;
+                document.getElementById('show-time').value = data.time;
+                document.getElementById('day').value = data.day;
+            } else {
+                alert('Failed to load movie details: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Failed to load movie details.');
+        });
+} else {
+    alert('Movie ID not provided in URL.');
+}
+</script>
 </body>
 </html>
