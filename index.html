@@ -1,27 +1,25 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Website</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <title>SRH Movies</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Link Swiper's CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
-
 </head>
 <body>
-    <!-- Navbar  -->
+    <!-- Navbar -->
     <header>
         <a href="#home" class="logo">
-            <img src="./img/SRHlogo.png" alt=""></i>MOVIES
+            <img src="./img/SRHlogo.png" alt="">MOVIES
         </a>
         <div class="bx bx-menu" id="menu-icon"></div>
 
-        <!-- menu  -->
+        <!-- Menu -->
         <ul class="navbar">
             <li><a href="#home" class="home-active">Home</a></li>
             <li><a href="#movies">Movies</a></li>
@@ -29,270 +27,69 @@
             <li><a href="#newsletter">About us</a></li>
             <div class="box_nav">
                 <form name="search">
-                    <input type="text" class="input" name="txt" onmouseout="this.value = ''; this.blur();">
+                    <input type="text" class="input" name="txt" placeholder="Search...">
                 </form>
                 <i class="fa fa-search"></i>
-                  
             </div>
         </ul>
 
         <div class="navbtns">
-            <a href="signup_page.html" class="btn" id="btns1">Register</a>
-            <a href="login_page.html" class="btn" id="btns1">Login In</a>
+            <a href="#" class="btn" id="btns1">Register</a>
+            <a href="./html/HomeUser.html" class="btn" id="btns1">Log In</a>
         </div>
-
     </header>
 
-    <!-- Home  -->
+    <!-- Home Section -->
     <section class="home swiper" id="home">
-        <div class="swiper-wrapper">
-            <div class="swiper-slide container">
-                <img src="./img/venom.png" alt="">
-                <div class="home-text">
-                    <span>Marvel Universe</span>
-                    <h1>Venom: The Last <br>Dance</h1>
-                    <a href="moviepage_dynamic.html?name=Venom" class="btn">Book Now</a>
-                    <a href="https://youtu.be/__2bjWbetsA" class="play">
-                        <i class='bx bx-play' ></i>
-                    </a>
-                </div>
-            </div>
-            <div class="swiper-slide container">
-                <img src="./img/batman.png" alt="">
-                <div class="home-text">
-                    <span>DC Extended Universe</span>
-                    <h1>Zack Snyder’s <br> Justice
-                        League</h1>
-                    <a href="login_page.html" class="btn">Book Now</a>
-                    <a href="https://youtu.be/ui37YKQ9AC4" class="play">
-                        <i class='bx bx-play' ></i>
-                    </a>
-                </div>
-            </div>
-            <div class="swiper-slide container">
-                <img src="./img/Godzilla.png" alt="">
-                <div class="home-text">
-                    <span>Warner Bros. Pictures</span>
-                    <h1>Godzilla vs. Kong</h1>
-                    <a href="" class="btn">Book Now</a>
-                    <a href="https://youtu.be/odM92ap8_c0" class="play">
-                        <i class='bx bx-play' ></i>
-                    </a>
-                </div>
-            </div>
-            <div class="swiper-slide container">
-                <img src="./img/home4.png" alt="">
-                <div class="home-text">
-                    <span>Marvel Universe</span>
-                    <h1>Avengers: <br>End Game</h1>
-                    <a href="" class="btn">Book Now</a>
-                    <a href="https://youtu.be/TcMBFSGVi1c" class="play">
-                        <i class='bx bx-play' ></i>
-                    </a>
-                </div>
-            </div>
-            
-          </div>
-          <div class="swiper-pagination"></div>
+        <div id="swiper-wrapper" class="swiper-wrapper">
+            <!-- Slides will be dynamically populated by JavaScript -->
+        </div>
+        <div class="swiper-pagination"></div>
     </section>
 
-    <!-- Movies  -->
+    <!-- Movies Section -->
     <div class="movies" id="movies">
         <h2 class="heading">Opening This Week</h2>
-        <!-- Movies container  -->
-        <div class="movies-container">
-            <!-- box-1  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m1.jpg" alt="">
-                </div>
-                <h3>Dr.Strange</h3>
-                <span>120 min | Action</span>
-            </div>
-            <!-- box-2  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m2.jpg" alt="">
-                </div>
-                <h3>Pathan</h3>
-                <span>120 min | Action</span>
-            </div>
-            <!-- box-3  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m3.jpg" alt="">
-                </div>
-                <h3>Batman vs Superman</h3>
-                <span>120 min | Thriller</span>
-            </div>
-            <!-- box-4  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m4.jpg" alt="">
-                </div>
-                <h3>John Wick 2</h3>
-                <span>120 min | Action</span>
-            </div>
-            <!-- box-5  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m5.jpg" alt="">
-                </div>
-                <h3>Aquaman</h3>
-                <span>120 min | Adventure</span>
-            </div>
-            <!-- box-6  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m6.jpg" alt="">
-                </div>
-                <h3>Black Panther</h3>
-                <span>120 min | Thriller</span>
-            </div>
-            <!-- box-7  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m7.jpg" alt="">
-                </div>
-                <h3>Uncharted</h3>
-                <span>120 min | Adventure</span>
-            </div>
-            <!-- box-8  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m8.jpg" alt="">
-                </div>
-                <h3>Brahmastra</h3>
-                <span>120 min | Action</span>
-            </div>
-            <!-- box-9  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m9.jpg" alt="">
-                </div>
-                <h3>Mortal-Engines</h3>
-                <span>120 min | Action</span>
-            </div>
-            <!-- box-10  -->
-            <div class="box">
-                <div class="box-img">
-                    <img src="./img/m10.jpg" alt="">
-                </div>
-                <h3>UnderWorld Blood Wars</h3>
-                <span>120 min | Action</span>
-            </div>
+        <div id="movies-container" class="movies-container">
+            <!-- Movies will be dynamically populated by JavaScript -->
         </div>
     </div>
 
-    <!-- coming  -->
+    <!-- Coming Soon Section -->
     <section class="coming" id="coming">
         <h2 class="heading">Coming Soon</h2>
-        <!-- coming contanier  -->
         <div class="coming-container swiper">
-            <div class="swiper-wrapper">
-                <!-- box-1  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c1.jpg" alt="">
-                    </div>
-                    <h3>Ant-Man and the Wasp:Quantumania</h3>
-                </div>
-                <!-- box-2  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c2.jpg" alt="">
-                    </div>
-                    <h3>The Flash</h3>
-                </div>
-                <!-- box-3  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c3.jpg" alt="">
-                    </div>
-                    <h3>Guardians of the Galaxy Vol.3</h3>
-                </div>
-                <!-- box-4  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c4.jpg" alt="">
-                    </div>
-                    <h3>Shazam! Fury of the Gods</h3>
-                </div>
-                <!-- box-5  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c5.jpg" alt="">
-                    </div>
-                    <h3>Aquaman and the Lost Kingdom</h3>
-                </div>
-                <!-- box-6  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c6.jpg" alt="">
-                    </div>
-                    <h3>John Wick:Chapter 4</h3>
-                </div>
-                <!-- box-7 -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c7.jpg" alt="">
-                    </div>
-                    <h3>Transformer rise of the beasts</h3>
-                </div>
-                <!-- box-8  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c8.jpg" alt="">
-                    </div>
-                    <h3>Mission: Impossible 7</h3>
-                </div>
-                <!-- box-9  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c9.png" alt="">
-                    </div>
-                    <h3>Deadpool 3</h3>
-                </div>
-                <!-- box-10  -->
-                <div class="swiper-slide box">
-                    <div class="box-img">
-                        <img src="./img/c10.jpg" alt="">
-                    </div>
-                    <h3>Dune: Part two</h3>
-                </div>
+            <div id="coming-wrapper" class="swiper-wrapper">
+                <!-- Coming soon slides will be dynamically populated -->
             </div>
+            <div class="swiper-pagination"></div>
         </div>
     </section>
 
-    <!-- Newsletter /\ -->
+    <!-- Newsletter -->
     <section class="newsletter" id="newsletter">
-        <h2>Subscribe To Get <br>Newsletter</h2>
-        <form action="">
-            <input type="email" class="email" placeholder="Enter Email" required>
-            <input type="submit" value="Subscribe" class="btn">
-        </form>
+        <h1>Newsletter</h1>
     </section>
 
-    <!-- footer  -->
+    <!-- Footer -->
     <section class="footer">
         <a href="" class="logo">
-            <img src="./img/SRHlogo2.png" alt=""></i>MOVIES
+            <img src="./img/SRHlogo2.png" alt="">MOVIES
         </a>
         <div class="social">
-            <a href=""><i class='bx bxl-facebook'></i></a>
-            <a href=""><i class='bx bxl-twitter'></i></a>
-            <a href=""><i class='bx bxl-instagram'></i></a>
+            <a href="#"><i class='bx bxl-facebook'></i></a>
+            <a href="#"><i class='bx bxl-twitter'></i></a>
+            <a href="#"><i class='bx bxl-instagram'></i></a>
         </div>
     </section>
 
-    <!-- Copyright  -->
+    <!-- Copyright -->
     <div class="copyright">
-        <p>&#169; SRH MOVIES All Right Reserved</p>
+        <p>&#169; SRH MOVIES All Right Reserved 2024.</p>
     </div>
 
-
-
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
-    <script src="main.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>

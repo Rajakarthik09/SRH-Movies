@@ -11,12 +11,6 @@
   <!-- Header Section -->
   <header>
     <div class="logo">SRH MOVIES</div>
-    <nav>
-      <a href="#">New Movie</a>
-      <a href="#">My Tickets</a>
-      <a href="#">Movie</a>
-      <a href="#">TV Series</a>
-    </nav>
     <div class="auth-buttons">
       <button class="logout">Logout</button>
     </div>
@@ -31,7 +25,11 @@
 
       <label for="genre">Genre</label>
       <select id="genre">
-        <option>Select Genre</option>
+        <option>Action</option>
+        <option>Thriller</option>
+        <option>Comedy</option>
+        <option>Romance</option>
+        <option>Horror</option>
       </select>
 
       <label for="description">Description</label>
@@ -42,42 +40,30 @@
 
       <label for="theater">Theater</label>
       <select id="theater">
-        <option>Select Theater</option>
+        <option>SRH Leipzig Theatre</option>
+        <option>SRH Berlin Theatre</option>
       </select>
 
-      <label for="show-time">Show Time</label>
-      <input type="text" id="show-time">
-
+      <label>Show Time</label>
+      <select id="showTime" name="show-time">
+        <option>13:00</option>
+        <option>16:00</option>
+        <option>21:00</option>
+      </select>
+      
       <label for="day">Day</label>
       <select id="day">
-        <option>Select Day</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
       </select>
 
-      <button type="button" class="add-details">Add Details</button>
+      <button type="button" class="add-details" onclick="save_changes()">Save Changes</button>
     </form>
-
-  <!-- Movies Table Section -->
-  <section class="movies-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Sr. No</th>
-          <th>Movie Name</th>
-          <th>Genre</th>
-          <th>Description</th>
-          <th>Release Date</th>
-          <th>Theatre</th>
-          <th>Show Time</th>
-          <th>Day</th>
-          <th>Edit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows can be added here -->
-      </tbody>
-    </table>
-    </section>
-  </section>
 
   <!-- Footer Section -->
   <footer>
@@ -95,22 +81,18 @@
   <script>
     // Fetch Movie Details on Page Load
     const urlParams = new URLSearchParams(window.location.search);
-    const movieId = urlParams.get('id');
-    console.log(movieId)
+    const movieName = urlParams.get('name');
+    console.log(movieName)
 
-    if (movieId) {
-        fetch(`http://localhost:3000/get_movie_details?id=${movieId}`)
+    if (movieName) {
+        fetch(`http://localhost:3000/get_movie_details?name=${movieName}`)
             .then(response => response.json())
             .then(data => {
             if (data.success) {
-                // Populate the form with movie details
-                document.getElementById('movie-name').value = data.name;
-                document.getElementById('genre').value = data.genre;
-                document.getElementById('description').value = data.description;
-                document.getElementById('release-date').value = data.release_date;
-                document.getElementById('theater').value = data.theater;
-                document.getElementById('show-time').value = data.time;
-                document.getElementById('day').value = data.day;
+                const movieDetails = data.data[0];
+                document.getElementById('movie-name').value = movieDetails.name;
+                document.getElementById('description').value = movieDetails.description;
+                document.getElementById('release-date').value = movieDetails.release_date;
             } else {
                 alert('Failed to load movie details: ' + data.message);
             }
@@ -122,6 +104,45 @@
 } else {
     alert('Movie ID not provided in URL.');
 }
+
+function save_changes() {
+    // Get updated values from the form
+    const updatedDetails = {
+      movie: {
+        name: document.getElementById('movie-name').value,
+        description: document.getElementById('description').value,
+        release_date: document.getElementById('release-date').value,
+        genre: document.getElementById('genre').value,
+      },
+      showtime: {
+        theater: document.getElementById('theater').value,
+        show_time: document.getElementById('showTime').value,
+        day: document.getElementById('day').value,
+      },
+    };
+
+    // Send a PUT request to update movie details
+    fetch('http://localhost:3000/update_movie_details', {
+      method: 'PUT', // Use PUT or POST based on your backend setup
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedDetails), // Convert the details to JSON format
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Movie details updated successfully!');
+        } else {
+          alert('Failed to update movie details: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('An error occurred while updating movie details.');
+      });
+  }
+
 </script>
 </body>
 </html>

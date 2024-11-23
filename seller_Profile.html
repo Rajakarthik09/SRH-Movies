@@ -157,7 +157,7 @@
                                     <td>${movie.genre}</td>
                                     <td>${movie.name}</td>
                                     <td>${movie.release_date}</td>
-                                    <td><button onclick="editMovie('${movie.id}')">Edit</button></td>
+                                    <td><button onclick="editMovie('${movie.name}')">Edit</button></td>
                                 </tr>`;
                             tableBody.innerHTML += row;
                         });
@@ -168,8 +168,8 @@
                 .catch(error => console.error("Error fetching movies:", error));
         }
 
-        function editMovie(movieId) {
-            window.location.href = `seller_edit_profile.html?id=${movieId}`;
+        function editMovie(movieName) {
+            window.location.href = `seller_edit_profile.html?name=${movieName}`;
         }
     </script>
 </body>

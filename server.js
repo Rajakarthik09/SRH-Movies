@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const port = 3000;
+const port = 3200;
 
 // Middleware
 app.use(bodyParser.json());
@@ -25,6 +25,32 @@ db.connect((err) => {
     }
     console.log("Connected to MySQL database.");
 });
+
+// Endpoint to fetch all movies
+app.get('/movies', (req, res) => {
+    // Query to fetch movies
+    db.query('SELECT * FROM movies', (err, results) => {
+      if (err) {
+        console.error('Error fetching movies:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Error fetching movies',
+          error: err.message,
+        });
+      }
+  
+      // Send movie data as JSON
+      res.json({
+        success: true,
+        data: results,
+      });
+    });
+  });
+  
+  // Start the server
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
 
 // Endpoint for login
 app.post("/login", (req, res) => {
@@ -175,22 +201,19 @@ app.get('/get_user_info', (req, res) => {
 });
 //Endpoint for getting movie details in edit page
 app.get('/get_movie_details', (req, res) => {
-    const { id } = req.query; // Use `req.query` to fetch query parameters in a GET request.
-
-    if (!id) {
-        return res.status(400).json({ success: false, message: 'Movie ID not found' });
+    const { name } = req.query; // Use `req.query` to fetch query parameters in a GET request.
+    console.log({name});
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Movie Name not found' });
     }
 
     const query = `
-        SELECT m.name,m.genre,m.description,m.release_date,s.theater,s.time,s.day
-        FROM movies m
-        LEFT JOIN 
-        showtimes s ON m.id = s.movie_id
-        WHERE 
-        m.id = ?;
+        SELECT name,description,release_date
+        FROM movies
+        WHERE name = ?;
     `;
 
-    db.query(query, [id], (err, results) => {
+    db.query(query, [name], (err, results) => {
         if (err) {
             console.error("Database error:", err);
             return res.status(500).json({ success: false, message: 'Database error' });
@@ -199,7 +222,7 @@ app.get('/get_movie_details', (req, res) => {
         if (results.length > 0) {
             res.json({ success: true, data: results });
         } else {
-            res.status(404).json({ success: false, message: 'Id not found' });
+            res.status(404).json({ success: false, message: 'Name not found' });
         }
     });
 });
@@ -315,6 +338,55 @@ app.post("/add_movies", (req, res) => {
             console.error("Error adding movies:", error);
             res.status(500).json({ success: false, message: "Failed to add movies and showtimes" });
         });
+});
+
+app.put("/update_movie_details", (req, res) => {
+    const { movie, showtime } = req.body;
+    const formattedDate = new Date(movie.release_date).toISOString().split('T')[0];
+    console.log(formattedDate);
+    // Validate input
+    if (
+        !movie ||
+        !movie.name ||
+        !movie.description ||
+        !movie.release_date ||
+        !movie.genre ||
+        !showtime ||
+        !showtime.theater ||
+        !showtime.show_time ||
+        !showtime.day
+    ) {
+        return res.status(400).json({ success: false, message: "Invalid input data" });
+    }
+
+    const movieUpdateQuery = `
+        UPDATE movies 
+        SET description = ?, release_date = DATE(?), genre = ? 
+        WHERE name = ?
+    `;
+    const showtimeUpdateQuery = `
+        UPDATE showtimes 
+        SET theater = ?, time = ?, day = ?
+        WHERE movie_id = (SELECT id FROM movies WHERE name = ?)
+    `;
+
+    // Perform the movie update
+    db.query(movieUpdateQuery, [movie.description, formattedDate, movie.genre, movie.name], (err, result) => {
+        if (err) {
+            console.error("Error updating movie:", err);
+            return res.status(500).json({ success: false, message: "Failed to update movie details" });
+        }
+
+        // Perform the showtime update
+        db.query(showtimeUpdateQuery, [showtime.theater, showtime.show_time, showtime.day, movie.name], (err) => {
+            if (err) {
+                console.error("Error updating showtime:", err);
+                return res.status(500).json({ success: false, message: "Failed to update showtime details" });
+            }
+
+            res.json({ success: true, message: "Movie and showtime details updated successfully!" });
+        });
+    });
 });
 
 app.get('/get_booked_seats', (req, res) => {
