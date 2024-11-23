@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Movies</title>
+  <link rel="stylesheet" href="css\seller_edit_profile.css">
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo">SRH MOVIES</div>
+    <div class="auth-buttons">
+      <button class="logout">Logout</button>
+    </div>
+  </header>
+
+  <!-- Edit Movies Form Section -->
+  <section class="edit-movies">
+    <h1>Edit Movies</h1>
+    <form class="movie-form">
+      <label for="movie-name">Movie Name</label>
+      <input type="text" id="movie-name" placeholder="Enter movie name">
+
+      <label for="genre">Genre</label>
+      <select id="genre">
+        <option>Action</option>
+        <option>Thriller</option>
+        <option>Comedy</option>
+        <option>Romance</option>
+        <option>Horror</option>
+      </select>
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="Enter description"></textarea>
+
+      <label for="release-date">Release Date</label>
+      <input type="text" id="release-date">
+
+      <label for="theater">Theater</label>
+      <select id="theater">
+        <option>SRH Leipzig Theatre</option>
+        <option>SRH Berlin Theatre</option>
+      </select>
+
+      <label>Show Time</label>
+      <select id="showTime" name="show-time">
+        <option>13:00</option>
+        <option>16:00</option>
+        <option>21:00</option>
+      </select>
+      
+      <label for="day">Day</label>
+      <select id="day">
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
+      </select>
+
+      <button type="button" class="add-details" onclick="save_changes()">Save Changes</button>
+    </form>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">Product</a>
+      <a href="#">Features</a>
+      <a href="#">Resources</a>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="#">Support</a>
+    </div>
+    <div class="footer-logo">LOGO</div>
+    <p>&copy; 2019 - 2020 Privacy - Terms</p>
+  </footer>
+  <script>
+    // Fetch Movie Details on Page Load
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieName = urlParams.get('name');
+    console.log(movieName)
+
+    if (movieName) {
+        fetch(`http://localhost:3000/get_movie_details?name=${movieName}`)
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                const movieDetails = data.data[0];
+                document.getElementById('movie-name').value = movieDetails.name;
+                document.getElementById('description').value = movieDetails.description;
+                document.getElementById('release-date').value = movieDetails.release_date;
+            } else {
+                alert('Failed to load movie details: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Failed to load movie details.');
+        });
+} else {
+    alert('Movie ID not provided in URL.');
+}
+
+function save_changes() {
+    // Get updated values from the form
+    const updatedDetails = {
+      movie: {
+        name: document.getElementById('movie-name').value,
+        description: document.getElementById('description').value,
+        release_date: document.getElementById('release-date').value,
+        genre: document.getElementById('genre').value,
+      },
+      showtime: {
+        theater: document.getElementById('theater').value,
+        show_time: document.getElementById('showTime').value,
+        day: document.getElementById('day').value,
+      },
+    };
+
+    // Send a PUT request to update movie details
+    fetch('http://localhost:3000/update_movie_details', {
+      method: 'PUT', // Use PUT or POST based on your backend setup
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedDetails), // Convert the details to JSON format
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Movie details updated successfully!');
+        } else {
+          alert('Failed to update movie details: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('An error occurred while updating movie details.');
+      });
+  }
+
+</script>
+</body>
+</html>

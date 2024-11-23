@@ -1,12 +1,10 @@
-// server.js
-
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const port = 3000;
+const port = 3200;
 
 // Middleware
 app.use(bodyParser.json());
@@ -16,7 +14,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "root1",
+    password: "srhmovies123",
     database: "srh_movies"
 });
 
@@ -27,6 +25,32 @@ db.connect((err) => {
     }
     console.log("Connected to MySQL database.");
 });
+
+// Endpoint to fetch all movies
+app.get('/movies', (req, res) => {
+    // Query to fetch movies
+    db.query('SELECT * FROM movies', (err, results) => {
+      if (err) {
+        console.error('Error fetching movies:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Error fetching movies',
+          error: err.message,
+        });
+      }
+  
+      // Send movie data as JSON
+      res.json({
+        success: true,
+        data: results,
+      });
+    });
+  });
+  
+  // Start the server
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
 
 // Endpoint for login
 app.post("/login", (req, res) => {
@@ -51,7 +75,7 @@ app.post("/signup_user", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     // Insert new user into the users table
-    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?,?)";
+    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
     db.query(query, [firstName, lastName, email, password, 'F'], (err, result) => {
         if (err) {
             console.error("Database insertion error:", err);
@@ -61,58 +85,27 @@ app.post("/signup_user", (req, res) => {
     });
 });
 
-// Endpoint for adding a seller (sign-up)
+// Endpoint for sign-up seller
 app.post("/signup_seller", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
     db.query(query, [firstName, lastName, email, password, 'T'], (err, result) => {
-      if (err) {
-        console.error("Database insertion error:", err);
-        return res.status(500).json({ success: false, message: "Database error" });
-      }
-      res.json({ success: true, message: "Seller added successfully" });
-    });
-  });
-  
-  // Endpoint for fetching all sellers from the database
-  app.get("/get_sellers", (req, res) => {
-    const query = "SELECT * FROM users WHERE seller = 'T'";
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error("Database fetch error:", err);
-        return res.status(500).json({ success: false, message: "Database error" });
-      }
-      res.json({ success: true, data: results });
-    });
-  });
-  
-  app.delete('/delete_seller', (req, res) => {
-    const { sellerId } = req.body; // Get seller ID from the request body
-    const query = 'DELETE FROM users WHERE id = ? AND seller = "T"';
-    db.query(query, [sellerId], (err, result) => {
         if (err) {
-            console.error('Error deleting seller:', err);
-            return res.status(500).json({ success: false, message: 'Database error' });
+            console.error("Database insertion error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
         }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ success: false, message: 'Seller not found' });
-        }
-        res.json({ success: true, message: 'Seller deleted successfully' });
+        res.json({ success: true, message: "Seller registered successfully" });
     });
-});  
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
 });
 
-// Endpoint to get bookings by email`
+// Endpoint to get bookings by email
 app.get('/get_bookings', (req, res) => {
-    const email = req.query.email;
+    const { email } = req.query;
 
     if (!email) {
         return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    // Query to fetch bookings by email
     const query = 'SELECT * FROM bookings WHERE email = ?';
     db.query(query, [email], (err, results) => {
         if (err) {
@@ -120,7 +113,6 @@ app.get('/get_bookings', (req, res) => {
             return res.status(500).json({ success: false, message: 'Database error' });
         }
 
-        // If bookings found, return the data
         if (results.length > 0) {
             res.json({ success: true, bookings: results });
         } else {
@@ -129,29 +121,13 @@ app.get('/get_bookings', (req, res) => {
     });
 });
 
-// Endpoint to get bookings based on the user's email
-app.get('/get_bookings', (req, res) => {
-    const { email } = req.query;
-    const query = 'SELECT * FROM bookings WHERE email = ?';
-
-    db.query(query, [email], (err, results) => {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Database error' });
-        }
-        if (results.length > 0) {
-            res.json({ success: true, bookings: results });
-        } else {
-            res.json({ success: false, message: 'No bookings found' });
-        }
-    });
-});
 // Endpoint to update user profile details
 app.put('/update_profile', (req, res) => {
     const { email, firstName, lastName, password } = req.body;
     const query = `
         UPDATE users
         SET first_name = ?, last_name = ?, password = ?
-        WHERE email = ?
+        WHERE email = ? and seller = 'F'
     `;
     db.query(query, [firstName, lastName, password, email], (err, result) => {
         if (err) {
@@ -163,4 +139,332 @@ app.put('/update_profile', (req, res) => {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     });
+});
+
+// Endpoint to get movies for the seller
+app.get("/get_movies", (req, res) => {
+    const { email } = req.query;
+    const query = "SELECT id, genre, name, release_date FROM movies WHERE seller_email = ?";
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+        res.json({ success: true, movies: results });
+    });
+});
+
+// Endpoint to update user profile details
+app.put('/update_seller_profile', (req, res) => {
+    const { email, firstName, lastName } = req.body;
+    const query = `
+        UPDATE users
+        SET first_name = ?, last_name = ?
+        WHERE email = ? and seller = 'T'
+    `;
+    db.query(query, [firstName, lastName, email], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Profile updated successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
+    });
+});
+
+app.get('/get_user_info', (req, res) => {
+    const { email } = req.query; // Use `req.query` to fetch query parameters in a GET request.
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const query = `
+        SELECT first_name, last_name 
+        FROM users 
+        WHERE email = ?
+    `;
+
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, details: results });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
+    });
+});
+//Endpoint for getting movie details in edit page
+app.get('/get_movie_details', (req, res) => {
+    const { name } = req.query; // Use `req.query` to fetch query parameters in a GET request.
+    console.log({name});
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Movie Name not found' });
+    }
+
+    const query = `
+        SELECT name,description,release_date
+        FROM movies
+        WHERE name = ?;
+    `;
+
+    db.query(query, [name], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, data: results });
+        } else {
+            res.status(404).json({ success: false, message: 'Name not found' });
+        }
+    });
+});
+
+// Endpoint to get movie details along with showtimes by name
+app.get('/get_movie', (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Movie name is required' });
+    }
+
+    const query = `
+        SELECT m.name, m.description, m.release_date, s.theater, s.time, s.day
+        FROM movies m
+        JOIN showtimes s ON m.id = s.movie_id
+        WHERE LOWER(m.name) = LOWER(?)
+    `;
+
+    db.query(query, [name], (err, results) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            // Structure the response
+            const movie = {
+                name: results[0].name,
+                description: results[0].description,
+                release_date: results[0].release_date,
+                showtimes: []
+            };
+
+            // Group showtimes by day
+            results.forEach(row => {
+                // Check if the day already exists
+                let dayEntry = movie.showtimes.find(showtime => showtime.day === row.day);
+                if (!dayEntry) {
+                    // If the day doesn't exist, create a new day entry
+                    dayEntry = {
+                        day: row.day,
+                        theaters: []
+                    };
+                    movie.showtimes.push(dayEntry);
+                }
+
+                // Check if the theater exists under the current day
+                let theaterEntry = dayEntry.theaters.find(theater => theater.name === row.theater);
+                if (!theaterEntry) {
+                    // If the theater doesn't exist, create a new theater entry
+                    theaterEntry = {
+                        name: row.theater,
+                        times: []
+                    };
+                    dayEntry.theaters.push(theaterEntry);
+                }
+
+                // Add the time to the theater entry
+                theaterEntry.times.push(row.time);
+            });
+
+            res.json({ success: true, movie });
+        } else {
+            res.json({ success: false, message: 'Movie not found' });
+        }
+    });
+});
+
+app.post("/add_movies", (req, res) => {
+    const { movies } = req.body;
+
+    if (!movies || !Array.isArray(movies) || movies.length === 0) {
+        return res.status(400).json({ success: false, message: "Invalid input data" });
+    }
+
+    const movieInsertQuery = `
+        INSERT INTO movies (name, genre, description, release_date)
+        VALUES (?, ?, ?, ?)
+    `;
+    const showtimeInsertQuery = `
+        INSERT INTO showtimes (movie_id, theater, time, day)
+        VALUES (?, ?, ?, ?)
+    `;
+
+    const promises = movies.map((movie) => {
+        const { movieName, genre, description, releaseDate, theater, showTime, days } = movie;
+
+        return new Promise((resolve, reject) => {
+            db.query(movieInsertQuery, [movieName, genre, description, releaseDate], (err, result) => {
+                if (err) {
+                    console.error("Error inserting movie:", err);
+                    return reject(err);
+                }
+
+                const movieId = result.insertId;
+
+                db.query(showtimeInsertQuery, [movieId, theater, showTime, days], (err) => {
+                    if (err) {
+                        console.error("Error inserting showtime:", err);
+                        return reject(err);
+                    }
+                    resolve();
+                });
+            });
+        });
+    });
+
+    Promise.all(promises)
+        .then(() => {
+            res.json({ success: true, message: "Movies and showtimes added successfully!" });
+        })
+        .catch((error) => {
+            console.error("Error adding movies:", error);
+            res.status(500).json({ success: false, message: "Failed to add movies and showtimes" });
+        });
+});
+
+app.put("/update_movie_details", (req, res) => {
+    const { movie, showtime } = req.body;
+    const formattedDate = new Date(movie.release_date).toISOString().split('T')[0];
+    console.log(formattedDate);
+    // Validate input
+    if (
+        !movie ||
+        !movie.name ||
+        !movie.description ||
+        !movie.release_date ||
+        !movie.genre ||
+        !showtime ||
+        !showtime.theater ||
+        !showtime.show_time ||
+        !showtime.day
+    ) {
+        return res.status(400).json({ success: false, message: "Invalid input data" });
+    }
+
+    const movieUpdateQuery = `
+        UPDATE movies 
+        SET description = ?, release_date = DATE(?), genre = ? 
+        WHERE name = ?
+    `;
+    const showtimeUpdateQuery = `
+        UPDATE showtimes 
+        SET theater = ?, time = ?, day = ?
+        WHERE movie_id = (SELECT id FROM movies WHERE name = ?)
+    `;
+
+    // Perform the movie update
+    db.query(movieUpdateQuery, [movie.description, formattedDate, movie.genre, movie.name], (err, result) => {
+        if (err) {
+            console.error("Error updating movie:", err);
+            return res.status(500).json({ success: false, message: "Failed to update movie details" });
+        }
+
+        // Perform the showtime update
+        db.query(showtimeUpdateQuery, [showtime.theater, showtime.show_time, showtime.day, movie.name], (err) => {
+            if (err) {
+                console.error("Error updating showtime:", err);
+                return res.status(500).json({ success: false, message: "Failed to update showtime details" });
+            }
+
+            res.json({ success: true, message: "Movie and showtime details updated successfully!" });
+        });
+    });
+});
+
+app.get('/get_booked_seats', (req, res) => {
+    const { name, time, theater, day } = req.query;
+
+    if (!name || !time || !theater || !day) {
+        return res.status(400).json({ success: false, message: 'Missing required parameters' });
+    }
+
+    const query = `
+        SELECT seat_numbers
+        FROM bookings
+        WHERE movie_name = ? AND time = ? AND theater = ? AND day = ? AND status = 'Confirmed';
+    `;
+
+    db.query(query, [name, time, theater, day], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            // Aggregate all booked seats
+            const bookedSeats = results.reduce((acc, row) => {
+                // If seat_numbers is a string, split it into an array
+                let seats;
+                if (typeof row.seat_numbers === 'string') {
+                    seats = row.seat_numbers.split(',');  // Split string into array
+                } else if (Array.isArray(row.seat_numbers)) {
+                    seats = row.seat_numbers;  // It's already an array
+                } else {
+                    console.warn(`Unexpected seat_numbers format for row: ${JSON.stringify(row)}`);
+                    seats = []; // Default to an empty array if something is wrong
+                }
+    
+                seats.forEach(seat => {
+                    const rowLetter = seat.charAt(0);  // Extract row (e.g., 'A' from 'A1')
+                    const seatNumber = parseInt(seat.slice(1), 10);  // Extract seat number (e.g., 1 from 'A1')
+    
+                    // Initialize row in acc if it doesn't exist
+                    if (!acc[rowLetter]) acc[rowLetter] = [];
+                    acc[rowLetter].push(seatNumber);
+                });
+                return acc;
+            }, {});
+    
+            res.json({ success: true, bookedSeats });
+        } else {
+            res.json({ success: true, bookedSeats: {} }); // No seats booked
+        }
+    });
+});
+
+app.post('/book_seat', (req, res) => {
+    const { email, movie_name, time, theater, day, seat_numbers, status } = req.body;
+
+    // Check if all required data is provided
+    if (!email || !movie_name || !time || !theater || !day || !seat_numbers || !status) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Insert the booking into the database
+    const query = `
+        INSERT INTO bookings (email, movie_name, day, time, seat_numbers, status, theater)
+        VALUES (?, ?, ?, ?, ?, ?, ?);
+    `;
+    const values = [email, movie_name, day, time, JSON.stringify(seat_numbers), status, theater];
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        res.json({ success: true, message: 'Booking successful' });
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
 });

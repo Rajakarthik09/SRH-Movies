@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Website</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Link Swiper's CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <a href="#home" class="logo">
+            <img src="../img/SRHlogo.png" alt="">MOVIES
+        </a>
+        <div class="bx bx-menu" id="menu-icon"></div>
+        <ul class="navbar">
+            <li><a href="#home" class="home-active">Home</a></li>
+            <li><a href="#movies">Movies</a></li>
+            <li><a href="#coming">Genre</a></li>
+            <li><a href="#newsletter">About us</a></li>
+            <div class="box_nav">
+                <form name="search">
+                    <input type="text" class="input" name="txt" onmouseout="this.value = ''; this.blur();">
+                </form>
+                <i class="fa fa-search"></i>
+            </div>
+        </ul>
+        <div class="navbtns">
+            <a href="#" class="btn" id="btns1">Register</a>
+            <a href="./HomeUser.html" class="btn" id="btns1">Login In</a>
+        </div>
+    </header>
+
+    <!-- Home -->
+    <section class="home swiper" id="home">
+        <div class="swiper-wrapper">
+            <% movies.forEach(function(movie) { %>
+                <div class="swiper-slide container">
+                    <img src="../public/img/<%= movie.image %>" alt="<%= movie.title %>">
+                    <div class="home-text">
+                        <span><%= movie.universe %></span>
+                        <h1><%= movie.title %></h1>
+                        <a href="<%= movie.book_link %>" class="btn">Book Now</a>
+                        <a href="<%= movie.trailer_link %>" class="play">
+                            <i class='bx bx-play'></i>
+                        </a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <div class="swiper-pagination"></div>
+    </section>
+
+    <!-- Movies -->
+    <div class="movies" id="movies">
+        <h2 class="heading">Opening This Week</h2>
+        <div class="movies-container">
+            <% movies.forEach(function(movie) { %>
+                <div class="box">
+                    <div class="box-img">
+                        <img src="../public/img/<%= movie.image %>" alt="<%= movie.title %>">
+                    </div>
+                    <h3><%= movie.title %></h3>
+                    <span><%= movie.duration %> min | <%= movie.genre %></span>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <!-- footer and other sections -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="../main.js"></script>
+</body>
+</html>
