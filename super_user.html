@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Seller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .header {
+            background-color: #f3f3f3;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header .logo {
+            font-weight: bold;
+        }
+        .header .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: left;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .add-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        table th {
+            background-color: #f9f9f9;
+        }
+        .action-btn {
+            background-color: #555;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">SRH MOVIES</div>
+        <button class="logout-btn">Logout</button>
+    </div>
+
+    <div class="container">
+        <h1>Hello Admin!</h1>
+        <p>Please proceed to add a seller profile</p>
+
+        <form id="sellerForm">
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="firstName" placeholder="Enter your first name">
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="lastName" placeholder="Enter your last name">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="email" placeholder="Please enter your email address">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Please enter your password">
+            </div>
+            <button type="button" class="add-btn" onclick="addSeller()">ADD SELLER</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S No</th>
+                    <th>Seller Name</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="sellersTableBody">
+                <!-- Dynamic rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <a href="#">Product</a>
+        <a href="#">Features</a>
+        <a href="#">Resources</a>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Support</a>
+        <p>&copy; 2010-2022 Privacy - Terms</p>
+    </div>
+
+    <script>
+        // Function to add a seller
+        async function addSeller() {
+            // Get the values from the form inputs
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Send a POST request to the backend to add the seller
+            const response = await fetch('http://localhost:3000/signup_seller', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    email,
+                    password
+                }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Seller added successfully!');
+                fetchSellers(); // Refresh the sellers list
+                clearForm(); // Clear the form fields
+            } else {
+                alert('Error adding seller');
+            }
+        }
+
+        // Function to fetch and display all sellers
+        async function fetchSellers() {
+            const response = await fetch('http://localhost:3000/get_sellers');
+            const data = await response.json();
+
+            if (data.success) {
+                const sellersTableBody = document.getElementById('sellersTableBody');
+                sellersTableBody.innerHTML = ''; // Clear the table before inserting data
+
+                data.data.forEach((seller, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${seller.first_name} ${seller.last_name}</td>
+                        <td><button class="action-btn" onclick="deleteSeller(${seller.id})">Delete</button></td>
+                    `;
+                    sellersTableBody.appendChild(row);
+                });
+            } else {
+                alert('Error fetching sellers');
+            }
+        }
+
+        // Function to clear the form fields
+        function clearForm() {
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+        // Function to delete a seller
+        async function deleteSeller(sellerId) {
+            const confirmation = confirm('Are you sure you want to delete this seller?');
+            if (!confirmation) return;
+
+            const response = await fetch('http://localhost:3000/delete_seller', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sellerId: sellerId,
+                }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Seller deleted successfully!');
+                fetchSellers(); // Refresh the sellers list
+            } else {
+                alert('Error deleting seller');
+            }
+        }
+
+        // Load sellers when the page loads
+        window.onload = fetchSellers;
+    </script>
+</body>
+</html>
