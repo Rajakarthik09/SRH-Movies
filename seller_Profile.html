@@ -10,9 +10,9 @@
     <!-- Header -->
     <header>
         <div class="nav-container">
-            <div class="logo">SRH <span>Movies</span></div>
+            <a href="index.html"><div class="logo">SRH <span>Movies</span></div></a>
             <nav>
-                <button><a href="index.html">Logout </a></button>
+                <button><a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;">Logout </a></button>
             </nav>
         </div>
     </header>
@@ -40,6 +40,7 @@
 
         <!-- Table Section -->
         <div class="table-section" id="movies-table">
+            <a href="seller_add_movies.html"><button type="button" class="add-movies" onclick="scrollToTable()">Add Movies</button></a>
             <table>
                 <thead>
                     <tr>
@@ -54,7 +55,6 @@
                     <!-- Rows will be added dynamically -->
                 </tbody>
             </table>
-            <button type="button" class="add-movies" onclick="scrollToTable()"><a href="seller_add_movies.html"> Add Movies</a></button>
         </div>
     </main>
 
@@ -133,7 +133,6 @@
                 .then(data => {
                     if (data.success) {
                         alert("Profile updated successfully!");
-                        window.location.href = "login_page.html";
                     } else {
                         alert("Failed to update profile: " + data.message);
                     }

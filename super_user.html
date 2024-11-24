@@ -92,8 +92,8 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo">SRH MOVIES</div>
-        <button class="logout-btn">Logout</button>
+        <a href="index.html" class="logo">SRH MOVIES</a>
+        <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;"><button class="logout-btn">Logout</button></a>
     </div>
 
     <div class="container">

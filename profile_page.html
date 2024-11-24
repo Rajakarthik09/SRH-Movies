@@ -10,14 +10,10 @@
     <!-- Navigation Bar -->
     <header>
         <div class="nav-container">
-            <div class="logo">SRH <span>Movies</span></div>
+            <a href="index.html">
+            <div class="logo">SRH <span>Movies</span></div></a>
             <nav>
-                <a href="#">New Movie</a>
-                <a href="#">Genre</a>
-                <a href="#">Movie</a>
-                <a href="#">TV Series</a>
-                <input type="text" placeholder="Search...">
-                <a href="index.html">Logout</a>
+                <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;">Logout</a>
                 
             </nav>
         </div>
@@ -141,12 +137,15 @@
             const lastName = document.getElementById("lastName").value;
             const password = document.getElementById("password").value;
             const email = document.getElementById("profileEmail").value;
+            const existingPassword = localStorage.getItem("userPassword"); // Assume this is how you get the existing password
 
+            // If the password field is empty, use the existing password
+            const passwordToUpdate = password ? password : existingPassword;
             // Create an object with the updated data
             const updatedData = {
                 firstName: firstName,
                 lastName: lastName,
-                password: password,
+                password: passwordToUpdate,
                 email: email,
             };
 

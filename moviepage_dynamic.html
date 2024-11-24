@@ -62,8 +62,8 @@
 
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
             padding: 0;
+            margin: 0px;
             background-color: #f8f9fa;
         }
         #movie-container {
@@ -71,10 +71,12 @@
             margin-bottom: 30px;
         }
         #movie-container img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 15px;
-        }
+        max-width: 500px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 15px auto;
+    }
         #movie-title {
             font-size: 2.5em;
             color: #dc3545;
@@ -90,7 +92,6 @@
             background-color: #ffffff;
             margin: 15px 0;
             padding: 15px;
-            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .day-container h3 {
@@ -122,17 +123,12 @@
     <header class="header">
         <a href="index.html" class="logo">SRH MOVIES</a>
         <nav class="nav-links">
-            <a href="#">New Movie</a>
-            <a href="#">Genre</a>
-            <a href="#">Movie</a>
-            <a href="#">TV Series</a>
-            <input type="text" placeholder="Search..." class="search-bar">
             <a href="signup_page.html" class="register-btn">Register</a>
         </nav>
     </header>
     
     <div id="movie-container">
-        <img id="movie-poster" src="img/default.png" alt="Movie Poster">
+        <img id="movie-poster" alt="Movie Poster">
         <h1 id="movie-title">Movie Title</h1>
         <p id="movie-description">Movie Description</p>
         <p id="release-date">Release Date</p>
@@ -181,10 +177,10 @@
             document.getElementById('release-date').textContent = `Release Date: ${new Date(movie.release_date).toDateString()}`;
 
             // Set poster if available (fallback to default)
-            const posterUrl = `img/${movie.name.toLowerCase().replace(/\s/g, '_')}.png`;
+            const posterUrl = `${movie.image}`;
             const posterElement = document.getElementById('movie-poster');
             posterElement.src = posterUrl;
-            posterElement.onerror = () => posterElement.src = 'img/default.png';
+            //posterElement.onerror = () => posterElement.src = './img/home1.png';
 
             // Render showtimes
             const showtimesContainer = document.getElementById('showtimes-container');
@@ -215,7 +211,7 @@
                     theater.times.forEach(time => {
                         const timeLink = document.createElement('a');
                         timeLink.textContent = time;
-                        timeLink.href = `#`;
+                        timeLink.href = `login_page.html`;
                         timeLink.classList.add('time');
                         timesDiv.appendChild(timeLink);
                     });

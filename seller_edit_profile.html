@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Movies</title>
-  <link rel="stylesheet" href="css\seller_edit_profile.css">
+  <link rel="stylesheet" href="css/seller_edit_profile.css">
 </head>
 <body>
 
   <!-- Header Section -->
   <header>
-    <div class="logo">SRH MOVIES</div>
+    <a href="index.html"><div class="logo">SRH MOVIES</div></a>
     <div class="auth-buttons">
-      <button class="logout">Logout</button>
+      <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;">
+        <button class="logout">Logout</button>
+      </a>
     </div>
   </header>
 
@@ -21,7 +23,7 @@
     <h1>Edit Movies</h1>
     <form class="movie-form">
       <label for="movie-name">Movie Name</label>
-      <input type="text" id="movie-name" placeholder="Enter movie name">
+      <input type="text" id="movie-name" placeholder="Enter movie name" disabled>
 
       <label for="genre">Genre</label>
       <select id="genre">
@@ -38,97 +40,113 @@
       <label for="release-date">Release Date</label>
       <input type="text" id="release-date">
 
-      <label for="theater">Theater</label>
-      <select id="theater">
-        <option>SRH Leipzig Theatre</option>
-        <option>SRH Berlin Theatre</option>
-      </select>
+      <h2>Showtimes</h2>
+      <table id="showtimes-table">
+        <thead>
+          <tr>
+            <th>Theater</th>
+            <th>Time</th>
+            <th>Day</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button type="button" onclick="addShowtime()">Add New Showtime</button>
 
-      <label>Show Time</label>
-      <select id="showTime" name="show-time">
-        <option>13:00</option>
-        <option>16:00</option>
-        <option>21:00</option>
-      </select>
-      
-      <label for="day">Day</label>
-      <select id="day">
-        <option>Monday</option>
-        <option>Tuesday</option>
-        <option>Wednesday</option>
-        <option>Thursday</option>
-        <option>Friday</option>
-        <option>Saturday</option>
-        <option>Sunday</option>
-      </select>
-
-      <button type="button" class="add-details" onclick="save_changes()">Save Changes</button>
+      <button type="button" class="save-changes" onclick="saveChanges()">Save Changes</button>
     </form>
+  </section>
 
-  <!-- Footer Section -->
-  <footer>
-    <div class="footer-links">
-      <a href="#">Product</a>
-      <a href="#">Features</a>
-      <a href="#">Resources</a>
-      <a href="#">About</a>
-      <a href="#">Blog</a>
-      <a href="#">Support</a>
-    </div>
-    <div class="footer-logo">LOGO</div>
-    <p>&copy; 2019 - 2020 Privacy - Terms</p>
-  </footer>
   <script>
-    // Fetch Movie Details on Page Load
-    const urlParams = new URLSearchParams(window.location.search);
-    const movieName = urlParams.get('name');
-    console.log(movieName)
+const urlParams = new URLSearchParams(window.location.search);
+  const movieName = urlParams.get('name');  // Get the movie name from the URL
 
-    if (movieName) {
-        fetch(`http://localhost:3000/get_movie_details?name=${movieName}`)
-            .then(response => response.json())
-            .then(data => {
-            if (data.success) {
-                const movieDetails = data.data[0];
-                document.getElementById('movie-name').value = movieDetails.name;
-                document.getElementById('description').value = movieDetails.description;
-                document.getElementById('release-date').value = movieDetails.release_date;
-            } else {
-                alert('Failed to load movie details: ' + data.message);
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Failed to load movie details.');
-        });
-} else {
+  // Fetch movie details and showtimes on page load
+  if (movieName) {
+    fetch(`http://localhost:3000/get_movie_details?name=${movieName}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const movieDetails = data.data.movie;
+          const showtimes = data.data.showtimes;
+
+          document.getElementById('movie-name').value = movieDetails.name;
+          document.getElementById('description').value = movieDetails.description;
+          document.getElementById('release-date').value = formatDate(movieDetails.release_date); // Format the release date
+          document.getElementById('genre').value = movieDetails.genre;
+
+          const tableBody = document.querySelector("#showtimes-table tbody");
+          tableBody.innerHTML = '';
+          showtimes.forEach((showtime, index) => {
+            const row = `
+              <tr>
+                <td>
+                  <select>
+                    <option value="SRH Leipzig Theatre" ${showtime.theater === 'SRH Leipzig Theatre' ? 'selected' : ''}>SRH Leipzig Theatre</option>
+                    <option value="SRH Berlin Theatre" ${showtime.theater === 'SRH Berlin Theatre' ? 'selected' : ''}>SRH Berlin Theatre</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="showtime-select">
+                    <option value="13:00:00" ${showtime.time === '13:00:00' ? 'selected' : ''}>13:00:00</option>
+                    <option value="16:00:00" ${showtime.time === '16:00:00' ? 'selected' : ''}>16:00:00</option>
+                    <option value="21:00:00" ${showtime.time === '21:00:00' ? 'selected' : ''}>21:00:00</option>
+                  </select>
+                </td>
+                <td>
+                  <select>
+                    ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                      .map(day => `<option ${showtime.day === day ? 'selected' : ''}>${day}</option>`)
+                      .join('')}
+                  </select>
+                </td>
+                <td><button type="button" onclick="removeShowtime(${index}, '${movieName}')">Remove</button></td>
+              </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+          });
+        } else {
+          alert('Failed to load movie details: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Failed to load movie details.');
+      });
+  } else {
     alert('Movie ID not provided in URL.');
-}
+  }
 
-function save_changes() {
-    // Get updated values from the form
-    const updatedDetails = {
-      movie: {
+  // Function to format date to 'YYYY-MM-DD'
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');  // Ensure 2-digit month
+    const day = String(date.getDate()).padStart(2, '0');        // Ensure 2-digit day
+    return `${year}-${month}-${day}`;
+  }
+
+    function saveChanges() {
+      const updatedMovie = {
         name: document.getElementById('movie-name').value,
         description: document.getElementById('description').value,
         release_date: document.getElementById('release-date').value,
-        genre: document.getElementById('genre').value,
-      },
-      showtime: {
-        theater: document.getElementById('theater').value,
-        show_time: document.getElementById('showTime').value,
-        day: document.getElementById('day').value,
-      },
-    };
+        genre: document.getElementById('genre').value
+      };
 
-    // Send a PUT request to update movie details
-    fetch('http://localhost:3000/update_movie_details', {
-      method: 'PUT', // Use PUT or POST based on your backend setup
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedDetails), // Convert the details to JSON format
-    })
+      // Fix the issue: accessing 'select' instead of 'input' for time
+      const updatedShowtimes = Array.from(document.querySelectorAll("#showtimes-table tbody tr")).map(row => ({
+        theater: row.cells[0].querySelector('select').value,  // Correct
+        time: row.cells[1].querySelector('select').value,    // Correct
+        day: row.cells[2].querySelector('select').value
+      }));
+
+      fetch('http://localhost:3000/update_movie_details', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie: updatedMovie, showtimes: updatedShowtimes })
+      })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -141,8 +159,68 @@ function save_changes() {
         console.error(err);
         alert('An error occurred while updating movie details.');
       });
-  }
+    }
 
-</script>
+    function addShowtime() {
+      const tableBody = document.querySelector("#showtimes-table tbody");
+      const newRow = `
+        <tr>
+          <td>
+            <select>
+              <option value="SRH Leipzig Theatre">SRH Leipzig Theatre</option>
+              <option value="SRH Berlin Theatre">SRH Berlin Theatre</option>
+            </select>
+          </td>
+          <td>
+            <select class="showtime-select">
+              <option value="13:00:00">13:00:00</option>
+              <option value="16:00:00">16:00:00</option>
+              <option value="21:00:00">21:00:00</option>
+            </select>
+          </td>
+          <td>
+            <select>
+              ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                .map(day => `<option>${day}</option>`)
+                .join('')}
+            </select>
+          </td>
+          <td><button type="button" onclick="removeShowtime(this, '${movieName}')">Remove</button></td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML('beforeend', newRow);
+    }
+
+    function removeShowtime(index, movieName) {
+      const row = document.querySelectorAll("#showtimes-table tbody tr")[index];
+      const theater = row.cells[0].querySelector('select').value;
+      const time = row.cells[1].querySelector('select').value;
+      const day = row.cells[2].querySelector('select').value;
+
+      fetch('http://localhost:3000/remove_showtime', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          movieName: movieName,  // Pass the movieName to the backend
+          theater: theater,
+          time: time,
+          day: day
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Showtime removed successfully!');
+          row.remove();  // Remove the row from the table if successful
+        } else {
+          alert('Failed to remove showtime: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('An error occurred while removing the showtime.');
+      });
+    }
+  </script>
 </body>
 </html>

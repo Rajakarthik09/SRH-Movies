@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRH Movies</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/Homeuser.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Link Swiper's CSS -->
@@ -26,27 +26,65 @@
             <li><a href="#coming">Genre</a></li>
             <li><a href="#newsletter">About us</a></li>
             <div class="box_nav">
-                <form name="search">
-                    <input type="text" class="input" name="txt" placeholder="Search...">
-                </form>
-                <i class="fa fa-search"></i>
             </div>
         </ul>
 
         <div class="navbtns">
-            <a href="#" class="btn" id="btns1">Register</a>
-            <a href="./html/HomeUser.html" class="btn" id="btns1">Log In</a>
+            <a href="signup_page.html" class="btn" id="btns">Register</a>
+            <a href="login_page.html" class="btn" id="btns1">Log In</a>
         </div>
+        <div class="dropdown-wrapper" id="dropdown-wrapper">
+            <!--- Dropdown profile --->
+            <input type="checkbox" id="dropdown-toggle" class="dropdown-toggle">
+            <label for="dropdown-toggle" class="dropdown-label"></label>
+                <!--- Dropdown menu list items --->
+                <div class="dropdown-menu dropdown-menu--display">
+                    <div class="upper-triangle"></div>
+                    <ul class="dropdown-list">
+                      <li>
+                        <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+                        <a href="profile_page.html"><span>Profile</span></a>
+                      </li>
+                      <li>
+                          <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+                          <a href="seller_Profile.html"><span>Seller Profile</span></a>
+                        </li>
+                      <li>
+                        <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+                        <a href="super_user.html"><span>Super User</span></a>
+                      </li>
+                      <li>
+                        <ion-icon name="mail-outline" class="dropdown-list-icon"></ion-icon>
+                        <span>Inbox</span>
+                      </li>
+                      <li>
+                        <ion-icon name="settings-outline" class="dropdown-list-icon"></ion-icon>
+                        <span>Settings</span>
+                      </li>
+                      <li>
+                        <ion-icon name="help-circle-outline" class="dropdown-list-icon"></ion-icon>
+                        <span>Help</span>
+                      </li>
+                      <li>
+                        <ion-icon name="log-out-outline" class="dropdown-list-icon"></ion-icon>
+                        <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;">
+                            <span>Logout</span>
+                          </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>          
     </header>
 
-    <!-- Home Section -->
     <section class="home swiper" id="home">
-        <div id="swiper-wrapper" class="swiper-wrapper">
-            <!-- Slides will be dynamically populated by JavaScript -->
+        <div class="swiper-wrapper">
+            <div id="banner-movie" class="swiper-slide container">
+                <!-- Banner content will be populated dynamically -->
+            </div>
         </div>
         <div class="swiper-pagination"></div>
     </section>
-
+    
     <!-- Movies Section -->
     <div class="movies" id="movies">
         <h2 class="heading">Opening This Week</h2>
@@ -54,22 +92,6 @@
             <!-- Movies will be dynamically populated by JavaScript -->
         </div>
     </div>
-
-    <!-- Coming Soon Section -->
-    <section class="coming" id="coming">
-        <h2 class="heading">Coming Soon</h2>
-        <div class="coming-container swiper">
-            <div id="coming-wrapper" class="swiper-wrapper">
-                <!-- Coming soon slides will be dynamically populated -->
-            </div>
-            <div class="swiper-pagination"></div>
-        </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section class="newsletter" id="newsletter">
-        <h1>Newsletter</h1>
-    </section>
 
     <!-- Footer -->
     <section class="footer">
@@ -88,8 +110,171 @@
         <p>&#169; SRH MOVIES All Right Reserved 2024.</p>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
-    <script src="./js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+    // Check if user is logged in
+    const userEmail = localStorage.getItem("userEmail");
+
+    if (userEmail) {
+        // Hide "Register" and "Login" buttons
+        document.getElementById("btns").style.display = "none";
+        document.getElementById("btns1").style.display = "none";
+
+        // Show the dropdown menu
+        document.getElementById("dropdown-wrapper").style.display = "inline-block";
+
+        try {
+            // Fetch user role from the backend
+            const response = await fetch(`http://localhost:3000/get_user_role?email=${encodeURIComponent(userEmail)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const role = data.userRole; // Assuming the backend returns { success: true, role: "seller" or "user" }
+
+                const dropdownList = document.querySelector(".dropdown-list");
+
+                if (role === "seller") {
+    // Remove regular profile link and show seller profile
+    dropdownList.innerHTML = `
+        <li>
+            <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="seller_Profile.html"><span>Seller Profile</span></a>
+        </li>
+        <li>
+            <ion-icon name="log-out-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="login_page.html" onclick="localStorage.removeItem('userEmail');"><span>Logout</span></a>
+        </li>
+    `;
+} else if (role === "admin") {
+    // Admin profile section
+    dropdownList.innerHTML = `
+        <li>
+            <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="super_user.html"><span>Manage Sellers</span></a>
+        </li>
+        <li>
+            <ion-icon name="settings-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="admin_dashboard.html"><span>Admin Dashboard</span></a>
+        </li>
+        <li>
+            <ion-icon name="log-out-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="login_page.html" onclick="localStorage.removeItem('userEmail');"><span>Logout</span></a>
+        </li>
+    `;
+} else if (role === "user") {
+    // Regular user profile section
+    dropdownList.innerHTML = `
+        <li>
+            <ion-icon name="person-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="profile_page.html"><span>Profile</span></a>
+        </li>
+        <li>
+            <ion-icon name="log-out-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="login_page.html" onclick="localStorage.removeItem('userEmail');"><span>Logout</span></a>
+        </li>
+    `;
+} else {
+    // If no valid role found, just show login option
+    dropdownList.innerHTML = `
+        <li>
+            <ion-icon name="log-in-outline" class="dropdown-list-icon"></ion-icon>
+            <a href="login_page.html"><span>Login</span></a>
+        </li>
+    `;
+}
+            } else {
+                console.error("Failed to fetch user role:", data.message);
+                alert("Could not determine user role.");
+            }
+        } catch (error) {
+            console.error("Error fetching user role:", error);
+            alert("Error fetching user role.");
+        }
+    }
+});
+async function loadMovies() {
+    try {
+        // Fetch movies data
+        const response = await fetch('http://localhost:3000/movies');
+        const movies = await response.json();
+
+        if (movies.length > 0) {
+            // Set the first movie in the banner
+            const firstMovie = movies[0];
+            const banner = document.getElementById('banner-movie');
+            const userEmail = localStorage.getItem("userEmail");
+
+            if (userEmail) {
+                // Fetch user role
+                const roleResponse = await fetch(`http://localhost:3000/get_user_role?email=${encodeURIComponent(userEmail)}`);
+                const roleData = await roleResponse.json();
+
+                const isUser = roleData.success && roleData.userRole === "user";
+
+                banner.innerHTML = `
+                    <img src="${firstMovie.image}" alt="${firstMovie.name}">
+                    <div class="home-text">
+                        <span>${firstMovie.genre}</span>
+                        <h1>${firstMovie.name}</h1>
+                        <a href="${isUser ? `moviepage_dynamic_reg.html` : `moviepage_dynamic.html`}?name=${encodeURIComponent(firstMovie.name)}" class="btn">Book Now</a>
+                        <a href="https://youtu.be/__2bjWbetsA" class="play">
+                            <i class='bx bx-play'></i>
+                        </a>
+                    </div>
+                `;
+
+                // Populate movies list
+                const moviesContainer = document.getElementById('movies-container');
+                moviesContainer.innerHTML = movies.map(movie => `
+                    <div class="box">
+                        <div class="box-img">
+                            <a href="${isUser ? `moviepage_dynamic_reg.html` : `moviepage_dynamic.html`}?name=${encodeURIComponent(movie.name)}">
+                                <img src="${movie.image}" alt="${movie.name}">
+                            </a>
+                        </div>
+                        <div class="movie-details">
+                            <h3>${movie.name}</h3>
+                            <p>${movie.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                // Default for non-logged-in users
+                banner.innerHTML = `
+                    <img src="${firstMovie.image}" alt="${firstMovie.name}">
+                    <div class="home-text">
+                        <span>${firstMovie.genre}</span>
+                        <h1>${firstMovie.name}</h1>
+                        <a href="moviepage_dynamic.html?name=${encodeURIComponent(firstMovie.name)}" class="btn">Book Now</a>
+                        <a href="https://youtu.be/__2bjWbetsA" class="play">
+                            <i class='bx bx-play'></i>
+                        </a>
+                    </div>
+                `;
+
+                const moviesContainer = document.getElementById('movies-container');
+                moviesContainer.innerHTML = movies.map(movie => `
+                    <div class="box">
+                        <div class="box-img">
+                            <a href="moviepage_dynamic.html?name=${encodeURIComponent(movie.name)}">
+                                <img src="${movie.image}" alt="${movie.name}">
+                            </a>
+                        </div>
+                        <div class="movie-details">
+                            <h3>${movie.name}</h3>
+                            <p>${movie.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+    }
+}
+    
+        // Load movies on page load
+        document.addEventListener('DOMContentLoaded', loadMovies);
+    </script>
 </body>
 </html>

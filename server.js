@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const port = 3200;
+const port = 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -26,31 +26,17 @@ db.connect((err) => {
     console.log("Connected to MySQL database.");
 });
 
-// Endpoint to fetch all movies
+// Endpoint to fetch movies
 app.get('/movies', (req, res) => {
-    // Query to fetch movies
-    db.query('SELECT * FROM movies', (err, results) => {
-      if (err) {
-        console.error('Error fetching movies:', err);
-        return res.status(500).json({
-          success: false,
-          message: 'Error fetching movies',
-          error: err.message,
-        });
-      }
-  
-      // Send movie data as JSON
-      res.json({
-        success: true,
-        data: results,
-      });
+    const query = 'SELECT name, description, release_date, genre, image FROM movies';
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching movies:', err);
+            return res.status(500).send({ error: 'Failed to fetch movies' });
+        }
+        res.json(results);
     });
-  });
-  
-  // Start the server
-  app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-  });
+});
 
 // Endpoint for login
 app.post("/login", (req, res) => {
@@ -75,8 +61,8 @@ app.post("/signup_user", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     // Insert new user into the users table
-    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
-    db.query(query, [firstName, lastName, email, password, 'F'], (err, result) => {
+    const query = "INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    db.query(query, [firstName, lastName, email, password, 'user'], (err, result) => {
         if (err) {
             console.error("Database insertion error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
@@ -88,8 +74,8 @@ app.post("/signup_user", (req, res) => {
 // Endpoint for sign-up seller
 app.post("/signup_seller", (req, res) => {
     const { firstName, lastName, email, password } = req.body;
-    const query = "INSERT INTO users (first_name, last_name, email, password, seller) VALUES (?, ?, ?, ?, ?)";
-    db.query(query, [firstName, lastName, email, password, 'T'], (err, result) => {
+    const query = "INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    db.query(query, [firstName, lastName, email, password, 'seller'], (err, result) => {
         if (err) {
             console.error("Database insertion error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
@@ -127,7 +113,7 @@ app.put('/update_profile', (req, res) => {
     const query = `
         UPDATE users
         SET first_name = ?, last_name = ?, password = ?
-        WHERE email = ? and seller = 'F'
+        WHERE email = ? and role = 'user'
     `;
     db.query(query, [firstName, lastName, password, email], (err, result) => {
         if (err) {
@@ -159,7 +145,7 @@ app.put('/update_seller_profile', (req, res) => {
     const query = `
         UPDATE users
         SET first_name = ?, last_name = ?
-        WHERE email = ? and seller = 'T'
+        WHERE email = ? and role = 'seller'
     `;
     db.query(query, [firstName, lastName, email], (err, result) => {
         if (err) {
@@ -199,33 +185,44 @@ app.get('/get_user_info', (req, res) => {
         }
     });
 });
+
 //Endpoint for getting movie details in edit page
 app.get('/get_movie_details', (req, res) => {
-    const { name } = req.query; // Use `req.query` to fetch query parameters in a GET request.
-    console.log({name});
+    const { name } = req.query;
     if (!name) {
-        return res.status(400).json({ success: false, message: 'Movie Name not found' });
+      return res.status(400).json({ success: false, message: 'Movie Name not found' });
     }
-
-    const query = `
-        SELECT name,description,release_date
-        FROM movies
-        WHERE name = ?;
+  
+    const movieQuery = `
+      SELECT name, description, release_date, genre 
+      FROM movies 
+      WHERE name = ?;
     `;
-
-    db.query(query, [name], (err, results) => {
+    const showtimeQuery = `
+      SELECT theater, time, day 
+      FROM showtimes 
+      WHERE movie_id = (SELECT id FROM movies WHERE name = ?);
+    `;
+  
+    db.query(movieQuery, [name], (err, movieResults) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+      if (movieResults.length === 0) {
+        return res.status(404).json({ success: false, message: 'Movie not found' });
+      }
+  
+      db.query(showtimeQuery, [name], (err, showtimeResults) => {
         if (err) {
-            console.error("Database error:", err);
-            return res.status(500).json({ success: false, message: 'Database error' });
+          return res.status(500).json({ success: false, message: 'Failed to load showtimes' });
         }
-
-        if (results.length > 0) {
-            res.json({ success: true, data: results });
-        } else {
-            res.status(404).json({ success: false, message: 'Name not found' });
-        }
+        res.json({
+          success: true,
+          data: { movie: movieResults[0], showtimes: showtimeResults }
+        });
+      });
     });
-});
+  });
 
 // Endpoint to get movie details along with showtimes by name
 app.get('/get_movie', (req, res) => {
@@ -236,7 +233,7 @@ app.get('/get_movie', (req, res) => {
     }
 
     const query = `
-        SELECT m.name, m.description, m.release_date, s.theater, s.time, s.day
+        SELECT m.name, m.description, m.release_date, m.image, s.theater, s.time, s.day
         FROM movies m
         JOIN showtimes s ON m.id = s.movie_id
         WHERE LOWER(m.name) = LOWER(?)
@@ -253,6 +250,7 @@ app.get('/get_movie', (req, res) => {
                 name: results[0].name,
                 description: results[0].description,
                 release_date: results[0].release_date,
+                image: results[0].image,
                 showtimes: []
             };
 
@@ -299,8 +297,8 @@ app.post("/add_movies", (req, res) => {
     }
 
     const movieInsertQuery = `
-        INSERT INTO movies (name, genre, description, release_date)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO movies (name, genre, description, release_date, image, seller_email)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
     const showtimeInsertQuery = `
         INSERT INTO showtimes (movie_id, theater, time, day)
@@ -308,10 +306,11 @@ app.post("/add_movies", (req, res) => {
     `;
 
     const promises = movies.map((movie) => {
-        const { movieName, genre, description, releaseDate, theater, showTime, days } = movie;
+        const { movieName, genre, description, releaseDate, image_path, userEmail, theater, showTimes, days } = movie;
 
         return new Promise((resolve, reject) => {
-            db.query(movieInsertQuery, [movieName, genre, description, releaseDate], (err, result) => {
+            // Insert movie into movies table
+            db.query(movieInsertQuery, [movieName, genre, description, releaseDate, image_path, userEmail], (err, result) => {
                 if (err) {
                     console.error("Error inserting movie:", err);
                     return reject(err);
@@ -319,76 +318,155 @@ app.post("/add_movies", (req, res) => {
 
                 const movieId = result.insertId;
 
-                db.query(showtimeInsertQuery, [movieId, theater, showTime, days], (err) => {
-                    if (err) {
-                        console.error("Error inserting showtime:", err);
-                        return reject(err);
-                    }
-                    resolve();
+                /// Insert showtimes for each combination of theater, showtime, and day
+                const showtimePromises = theater.flatMap((theater) => {
+                    return showTimes.flatMap((time) => {
+                        return days.map((day) => {
+                            return new Promise((showtimeResolve, showtimeReject) => {
+                                db.query(showtimeInsertQuery, [movieId, theater, time, day], (err) => {
+                                    if (err) {
+                                        console.error("Error inserting showtime:", err);
+                                        return showtimeReject(err);
+                                    }
+                                    showtimeResolve();
+                                });
+                            });
+                        });
+                    });
                 });
+
+                // Wait for all showtimes to be inserted
+                Promise.all(showtimePromises)
+                    .then(resolve)
+                    .catch(reject);
             });
         });
     });
 
+    // Handle all promises for inserting movies and showtimes
     Promise.all(promises)
         .then(() => {
-            res.json({ success: true, message: "Movies and showtimes added successfully!" });
+            res.status(200).json({ success: true, message: "Movies and showtimes saved successfully!" });
         })
-        .catch((error) => {
-            console.error("Error adding movies:", error);
-            res.status(500).json({ success: false, message: "Failed to add movies and showtimes" });
+        .catch((err) => {
+            console.error("Error saving movies and showtimes:", err);
+            res.status(500).json({ success: false, message: "An error occurred while saving the movies and showtimes." });
         });
 });
 
-app.put("/update_movie_details", (req, res) => {
-    const { movie, showtime } = req.body;
-    const formattedDate = new Date(movie.release_date).toISOString().split('T')[0];
-    console.log(formattedDate);
-    // Validate input
+// PUT endpoint to update movie details and showtimes
+app.put('/update_movie_details', (req, res) => {
+    const { movie, showtimes } = req.body;
+
+    // Validation check for required fields
     if (
         !movie ||
         !movie.name ||
         !movie.description ||
         !movie.release_date ||
         !movie.genre ||
-        !showtime ||
-        !showtime.theater ||
-        !showtime.show_time ||
-        !showtime.day
+        !showtimes ||
+        !Array.isArray(showtimes)
     ) {
-        return res.status(400).json({ success: false, message: "Invalid input data" });
+        return res.status(400).json({ success: false, message: 'Invalid input data' });
     }
 
-    const movieUpdateQuery = `
+    const formattedDate = new Date(movie.release_date).toISOString().split('T')[0];
+
+    // Query to update the movie details
+    const updateMovieQuery = `
         UPDATE movies 
-        SET description = ?, release_date = DATE(?), genre = ? 
-        WHERE name = ?
-    `;
-    const showtimeUpdateQuery = `
-        UPDATE showtimes 
-        SET theater = ?, time = ?, day = ?
-        WHERE movie_id = (SELECT id FROM movies WHERE name = ?)
+        SET description = ?, release_date = ?, genre = ? 
+        WHERE name = ?;
     `;
 
-    // Perform the movie update
-    db.query(movieUpdateQuery, [movie.description, formattedDate, movie.genre, movie.name], (err, result) => {
+    // Query to delete existing showtimes for the movie
+    const deleteShowtimesQuery = `
+        DELETE FROM showtimes 
+        WHERE movie_id = (SELECT id FROM movies WHERE name = ?);
+    `;
+
+    // Query to insert new showtimes
+    const insertShowtimeQuery = `
+        INSERT INTO showtimes (movie_id, theater, time, day) 
+        VALUES ((SELECT id FROM movies WHERE name = ?), ?, ?, ?);
+    `;
+
+    // Start updating the movie details
+    db.query(updateMovieQuery, [movie.description, formattedDate, movie.genre, movie.name], (err) => {
         if (err) {
-            console.error("Error updating movie:", err);
-            return res.status(500).json({ success: false, message: "Failed to update movie details" });
+            console.error('Error updating movie details:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update movie details' });
         }
 
-        // Perform the showtime update
-        db.query(showtimeUpdateQuery, [showtime.theater, showtime.show_time, showtime.day, movie.name], (err) => {
+        // Delete existing showtimes for the movie
+        db.query(deleteShowtimesQuery, [movie.name], (err) => {
             if (err) {
-                console.error("Error updating showtime:", err);
-                return res.status(500).json({ success: false, message: "Failed to update showtime details" });
+                console.error('Error deleting existing showtimes:', err);
+                return res.status(500).json({ success: false, message: 'Failed to clear old showtimes' });
             }
 
-            res.json({ success: true, message: "Movie and showtime details updated successfully!" });
+            // Insert the updated showtimes
+            const showtimePromises = showtimes.map(showtime =>
+                new Promise((resolve, reject) => {
+                    db.query(
+                        insertShowtimeQuery,
+                        [movie.name, showtime.theater, showtime.time, showtime.day],
+                        (err) => {
+                            if (err) {
+                                console.error('Error inserting showtime:', err);
+                                return reject(err);
+                            }
+                            resolve();
+                        }
+                    );
+                })
+            );
+
+            Promise.all(showtimePromises)
+                .then(() => {
+                    res.json({ success: true, message: 'Movie and showtime details updated successfully!' });
+                })
+                .catch((err) => {
+                    console.error('Error during showtime insertion:', err);
+                    res.status(500).json({ success: false, message: 'Failed to update showtime details' });
+                });
         });
     });
 });
 
+// DELETE endpoint to remove a specific showtime for a movie
+app.delete('/remove_showtime', (req, res) => {
+    const { movieName, theater, time, day } = req.body;
+  
+    // Validation check for required parameters
+    if (!movieName || !theater || !time || !day) {
+      return res.status(400).json({ success: false, message: 'Missing required parameters' });
+    }
+  
+    // Query to delete the specific showtime
+    const deleteShowtimeQuery = `
+      DELETE FROM showtimes 
+      WHERE movie_id = (SELECT id FROM movies WHERE name = ?) 
+      AND theater = ? 
+      AND time = ? 
+      AND day = ?;
+    `;
+  
+    db.query(deleteShowtimeQuery, [movieName, theater, time, day], (err, result) => {
+      if (err) {
+        console.error('Error deleting showtime:', err);
+        return res.status(500).json({ success: false, message: 'Failed to delete showtime' });
+      }
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Showtime not found' });
+      }
+  
+      res.json({ success: true, message: 'Showtime removed successfully!' });
+    });
+  });
+  
 app.get('/get_booked_seats', (req, res) => {
     const { name, time, theater, day } = req.query;
 
@@ -462,6 +540,56 @@ app.post('/book_seat', (req, res) => {
         }
 
         res.json({ success: true, message: 'Booking successful' });
+    });
+});
+
+app.get("/get_user_role", (req, res) => {
+    // Assuming the logged-in user email is sent as a query parameter or part of session
+    const email = req.query.email; // Or use req.session.email if using sessions
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const query = "SELECT role FROM users WHERE email = ?";
+    db.query(query, [email], (err, results) => {
+        if (err) {
+            console.error("Database fetch error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const userRole = results[0].role;
+        res.json({ success: true, userRole: userRole });
+    });
+});
+
+app.get("/get_sellers", (req, res) => {
+    const query = "SELECT * FROM users WHERE role = 'seller'";
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Database fetch error:", err);
+        return res.status(500).json({ success: false, message: "Database error" });
+      }
+      res.json({ success: true, data: results });
+    });
+  });
+
+  app.delete('/delete_seller', (req, res) => {
+    const { sellerId } = req.body; // Get seller ID from the request body
+    const query = 'DELETE FROM users WHERE id = ? AND role = "seller"';
+    db.query(query, [sellerId], (err, result) => {
+        if (err) {
+            console.error('Error deleting seller:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Seller not found' });
+        }
+        res.json({ success: true, message: 'Seller deleted successfully' });
     });
 });
 

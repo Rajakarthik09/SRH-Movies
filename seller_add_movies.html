@@ -10,9 +10,9 @@
     <!-- Header -->
     <header>
         <div class="nav-container">
-            <div class="logo">SRH <span>Movies</span></div>
+            <a href="index.html"><div class="logo">SRH <span>Movies</span></div></a>
             <nav>
-                <button>Logout</button>
+                <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;"><button>Logout</button></a>
             </nav>
         </div>
     </header>
@@ -42,21 +42,24 @@
                     <label>Release Date</label>
                     <input type="text" id="releaseDate" placeholder="DD/MM/YYYY" required>
 
+                    <label>Image Location</label>
+                    <input type="text" id="image" placeholder="Enter image path" required>
+
                     <label>Theater</label>
-                    <select id="theater" name="theater">
+                    <select id="theater" name="theater" multiple>
                         <option>SRH Leipzig Theatre</option>
                         <option>SRH Berlin Theatre</option>
                     </select>
 
-                    <label>Show Time</label>
-                    <select id="showTime" name="show-time">
+                    <label>Show Times</label>
+                    <select id="showTime" name="show-time" multiple>
                         <option>13:00</option>
                         <option>16:00</option>
                         <option>21:00</option>
                     </select>
 
-                    <label>Day</label>
-                    <select id="day" name="day">
+                    <label>Days</label>
+                    <select id="day" name="day" multiple>
                         <option>Monday</option>
                         <option>Tuesday</option>
                         <option>Wednesday</option>
@@ -81,6 +84,7 @@
                         <th>Genre</th>
                         <th>Description</th>
                         <th>Release Date</th>
+                        <th>Image Path</th>
                         <th>Theater</th>
                         <th>Show Time</th>
                         <th>Day</th>
@@ -115,6 +119,7 @@
         const movieTableBody = document.querySelector("#movieTable tbody");
         const addMovieButton = document.getElementById("addMovieButton");
         const saveChangesButton = document.getElementById("saveChangesButton");
+        const userEmail = localStorage.getItem("userEmail");
 
         let movieList = [];
         let movieCounter = 1;
@@ -124,11 +129,12 @@
             const genre = document.getElementById("genre").value;
             const description = document.getElementById("description").value;
             let releaseDate = document.getElementById("releaseDate").value;
-            const theater = document.getElementById("theater").value;
-            const showTime = document.getElementById("showTime").value;
-            const days = document.getElementById("day").value;
+            const image_path = document.getElementById("image").value
+            const theater = Array.from(document.getElementById("theater").selectedOptions).map(option => option.value);
+            const selectedShowTimes = Array.from(document.getElementById("showTime").selectedOptions).map(option => option.value);
+            const selectedDays = Array.from(document.getElementById("day").selectedOptions).map(option => option.value);
 
-            if (!movieName || !description || !releaseDate) {
+            if (!movieName || !description || !releaseDate || selectedShowTimes.length === 0 || selectedDays.length === 0) {
                 alert("Please fill out all required fields.");
                 return;
             }
@@ -138,15 +144,17 @@
             releaseDate = `${year}-${month}-${day}`;
 
             const movieData = {
-                id: movieCounter,
                 movieName,
                 genre,
                 description,
                 releaseDate,
+                image_path,
+                userEmail,
                 theater,
-                showTime,
-                days
+                showTimes: selectedShowTimes,
+                days: selectedDays
             };
+            console.log(movieData)
 
             movieList.push(movieData);
 
@@ -157,9 +165,10 @@
                 <td>${genre}</td>
                 <td>${description}</td>
                 <td>${releaseDate}</td>
+                <td>${image_path}</td>
                 <td>${theater}</td>
-                <td>${showTime}</td>
-                <td>${days}</td>
+                <td>${selectedShowTimes.join(", ")}</td>
+                <td>${selectedDays.join(", ")}</td>
             `;
             movieTableBody.appendChild(row);
 
@@ -173,7 +182,7 @@
                 alert("No movies to save!");
                 return;
             }
-            console.log(movieList)
+
             fetch("http://localhost:3000/add_movies", {
                 method: "POST",
                 headers: {
@@ -181,19 +190,19 @@
                 },
                 body: JSON.stringify({ movies: movieList }),
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        alert("Movies saved successfully!");
-                        movieList = []; // Clear the local list
-                    } else {
-                        alert("Failed to save movies: " + data.message);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error saving movies:", error);
-                    alert("An error occurred while saving the movies.");
-                });
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Movies saved successfully!");
+                    movieList = []; // Clear the local list
+                } else {
+                    alert("Failed to save movies: " + data.message);
+                }
+            })
+            .catch((error) => {
+                console.error("Error saving movies:", error);
+                alert("An error occurred while saving the movies.");
+            });
         });
     </script>
 </body>

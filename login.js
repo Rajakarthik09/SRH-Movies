@@ -21,8 +21,9 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         const result = await response.json();
 
         if (result.success) {
-            window.location.href = "HomeUser.html";
+            window.location.href = "index.html";
             localStorage.setItem("userEmail", email);
+            localStorage.setItem("userPassword",password);
         } else {
             alert(result.message || "Invalid email or password.");
         }

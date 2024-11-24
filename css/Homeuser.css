@@ -49,11 +49,16 @@ header.shadow .logo{
 }
 header.shadow #btns1{
     border: 1px solid #000;
+    display: inline-block;
 }
-
+header.shadow #btns{
+    border: 1px solid #000;
+    display: inline-block;
+}
 /* Dropdown css */
 .dropdown-wrapper {
     position: relative;
+    display: none;
   }
   
   .dropdown-toggle {
