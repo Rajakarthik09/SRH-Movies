@@ -1,0 +1,121 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+h1, h2 {
+    margin-bottom: 15px;
+    color: #111;
+}
+
+p {
+    margin: 0 0 15px;
+    line-height: 1.6;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    padding: 15px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.about-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    flex-grow: 1; /* Center the "About Us" title */
+}
+
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 15px;
+    font-size: 14px;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* Welcome Section */
+.welcome {
+    text-align: center;
+    padding: 30px 0;
+    background-color: #f4f4f4;
+}
+
+.welcome h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-style: italic;
+    color: #666;
+}
+
+/* Grid of 4 Boxes */
+.info-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.info-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.info-box h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.social-icons {
+    margin-top: 10px;
+}
+
+.social-link {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.social-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .info-section {
+        grid-template-columns: 1fr;
+    }
+}
