@@ -72,6 +72,11 @@
         // Retrieve the email from localStorage and display it on the profile page
         document.addEventListener("DOMContentLoaded", function() {
             const email = localStorage.getItem("userEmail");
+            const userRole = localStorage.getItem("userRole"); // Get user role from localStorage
+            if (userRole !== 'user') {
+            window.location.replace('login_page.html');
+            return;
+        }
             console.log(email)
             if (email) {
                 document.getElementById("profileEmail").value = email;

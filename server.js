@@ -580,16 +580,50 @@ app.get("/get_sellers", (req, res) => {
 
   app.delete('/delete_seller', (req, res) => {
     const { sellerId } = req.body; // Get seller ID from the request body
-    const query = 'DELETE FROM users WHERE id = ? AND role = "seller"';
-    db.query(query, [sellerId], (err, result) => {
+
+    // Query to find the seller's email using the seller's ID
+    const find_seller_email_query = 'SELECT email FROM users WHERE id = ? AND role = "seller"';
+
+    // Query to delete movies associated with the seller
+    const delete_movies_query = 'DELETE FROM movies WHERE seller_email = ?';
+
+    // Query to delete the seller
+    const delete_seller_query = 'DELETE FROM users WHERE id = ? AND role = "seller"';
+
+    // Start by finding the seller's email
+    db.query(find_seller_email_query, [sellerId], (err, sellerResult) => {
         if (err) {
-            console.error('Error deleting seller:', err);
+            console.error('Error finding seller email:', err);
             return res.status(500).json({ success: false, message: 'Database error' });
         }
-        if (result.affectedRows === 0) {
+
+        if (sellerResult.length === 0) {
             return res.status(404).json({ success: false, message: 'Seller not found' });
         }
-        res.json({ success: true, message: 'Seller deleted successfully' });
+
+        const sellerEmail = sellerResult[0].email; // Get the seller's email
+
+        // Delete movies associated with the seller
+        db.query(delete_movies_query, [sellerEmail], (err) => {
+            if (err) {
+                console.error('Error deleting movies:', err);
+                return res.status(500).json({ success: false, message: 'Database error' });
+            }
+
+            // Delete the seller
+            db.query(delete_seller_query, [sellerId], (err, result) => {
+                if (err) {
+                    console.error('Error deleting seller:', err);
+                    return res.status(500).json({ success: false, message: 'Database error' });
+                }
+
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ success: false, message: 'Seller not found' });
+                }
+
+                res.json({ success: true, message: 'Seller and associated movies deleted successfully' });
+            });
+        });
     });
 });
 

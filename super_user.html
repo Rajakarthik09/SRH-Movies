@@ -145,6 +145,13 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        const userRole = localStorage.getItem("userRole"); // Get user role from localStorage
+
+        if (userRole !== 'admin') {
+            window.location.replace('login_page.html');
+        }
+        });
         // Function to add a seller
         async function addSeller() {
             // Get the values from the form inputs

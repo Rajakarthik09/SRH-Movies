@@ -132,6 +132,7 @@
                 const role = data.userRole; // Assuming the backend returns { success: true, role: "seller" or "user" }
 
                 const dropdownList = document.querySelector(".dropdown-list");
+                localStorage.setItem("userRole",role);
 
                 if (role === "seller") {
     // Remove regular profile link and show seller profile
