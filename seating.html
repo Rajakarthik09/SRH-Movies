@@ -118,19 +118,25 @@
       background-color: #6c757d;
     }
     .pay-btn {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #b00;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #b00;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
     }
     .pay-btn:disabled {
       background-color: #888;
       cursor: not-allowed;
+    }
+    #price-display {
+      text-align: center;
+      font-size: 18px;
+      margin: 10px 0;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -160,6 +166,10 @@
   </div>
 </div>
 
+<!-- Total Price Display -->
+<div id="price-display">
+  <span id="total-price">Total Price: Rs. 0</span>
+</div>
 
 <div class="legend">
   <div class="legend-item">

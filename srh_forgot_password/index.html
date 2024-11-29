@@ -18,27 +18,17 @@
             <img src="./images/SRHlogo.png" alt="SRH Movies Logo">
             <span>MOVIES</span>
         </div>
-        <nav class="nav">
-            <a href="#">Home</a>
-            <a href="#">Movies</a>
-            <a href="#">Genre</a>
-            <a href="#">About</a>
-            <a href="#"><span class="search-icon">🔍</span></a>
-            <button class="register-btn">Register</button>
-            <button class="login-btn">Login</button>
-        </nav>
     </header>
     <main class="container">
-        <a href="#" class="back-link">← Back to login</a>
+        <a href="#" class="back-link" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('../login_page.html'); return false;">← Back to login</a>
         <div class="form-container">
             <h1>Forgot your password?</h1>
-            <p>Don't worry, happens to all of us. Enter your email below to recover your password</p>
+            <p>Don't worry, happens to all of us. Enter your email below to recover your password.</p>
             <form id="resetForm">
                 <label for="email">Email</label>
                 <input type="email" id="email" placeholder="Enter your email" required>
                 <button type="submit" class="submit-btn">Submit</button>
             </form>
-            
         </div>
         <div class="image-container">
             <img src="./images/heroimg.png" alt="Security illustration">
@@ -62,6 +52,95 @@
       <p>&#169; SRH MOVIES All Right Reserved</p>
   </div>
 
-    <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const resetForm = document.getElementById("resetForm");
+        const formContainer = document.querySelector(".form-container");
+    
+        // Handle email validation form submission
+        resetForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+    
+            const emailInput = document.getElementById("email");
+            const email = emailInput.value.trim();
+            let userRole = localStorage.getItem("userRole") || "user"; // Use "user" as default if no role is found
+            console.log(userRole);
+
+            // Call the backend endpoint to validate the email
+            fetch("http://localhost:3000/validate-email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Ensure the role from the database matches the role in localStorage
+                        if (data.role !== userRole) {
+                            console.log(data.role);
+                            alert("You do not have permission to reset this password.");
+                            return;
+                        }
+    
+                        // Email is valid and role matches, show reset password form
+                        formContainer.innerHTML = `
+                            <h1>Reset your password</h1>
+                            <p>Enter your new password below.</p>
+                            <form id="resetPasswordForm">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" placeholder="Enter new password" required>
+                                <label for="confirmPassword">Confirm Password</label>
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                                <button type="submit" class="submit-btn">Reset Password</button>
+                            </form>
+                        `;
+    
+                        const resetPasswordForm = document.getElementById("resetPasswordForm");
+                        resetPasswordForm.addEventListener("submit", function (e) {
+                            e.preventDefault();
+    
+                            const newPassword = document.getElementById("newPassword").value.trim();
+                            const confirmPassword = document.getElementById("confirmPassword").value.trim();
+    
+                            if (newPassword !== confirmPassword) {
+                                alert("Passwords do not match!");
+                                return;
+                            }
+    
+                            // Call the backend endpoint to reset the password
+                            fetch("http://localhost:3000/update-password", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ email, newPassword }),
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert("Password reset successfully!");
+                                        formContainer.innerHTML = "<p>Your password has been reset. You can now log in.</p>";
+                                    } else {
+                                        alert("Failed to reset password: " + data.message);
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error("Error resetting password:", err);
+                                    alert("An error occurred while resetting the password.");
+                                });
+                        });
+                    } else {
+                        alert("Email validation failed: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error validating email:", err);
+                    alert("An error occurred while validating the email.");
+                });
+        });
+    });
+    </script>
 </body>
 </html>

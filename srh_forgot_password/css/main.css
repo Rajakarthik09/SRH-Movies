@@ -95,6 +95,7 @@ body {
 .form-container {
   max-width: 400px;
   text-align: left;
+  margin-top: 150px;
 }
 
 h1 {
@@ -121,6 +122,15 @@ label {
 }
 
 input[type="email"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+input[type="password"] {
   width: 100%;
   padding: 12px;
   margin-bottom: 20px;

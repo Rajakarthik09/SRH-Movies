@@ -37,7 +37,9 @@ p {
     font-weight: bold;
     color: #fff;
     text-align: center;
-    flex-grow: 1; /* Center the "About Us" title */
+    flex-grow: 1;
+    position: absolute;
+    left: 46%;
 }
 
 .nav-link {
@@ -97,6 +99,9 @@ p {
     color: #fff;
     text-align: center;
     padding: 20px;
+    position:absolute;
+    width: 100%;
+    bottom: 0%;
 }
 
 .social-icons {

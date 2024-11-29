@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .header {
+            background-color: #f3f3f3;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header .logo {
+            font-weight: bold;
+        }
+        .header .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: left;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        .profile-container {
+            margin: 20px 0;
+        }
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .profile-row label {
+            font-weight: bold;
+            width: 30%;
+        }
+        .profile-row span {
+            width: 70%;
+        }
+        .reset-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="logo">SRH MOVIES</a>
+        <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;"><button class="logout-btn">Logout</button></a>
+    </div>
+
+    <div class="container">
+        <h1>Admin Profile</h1>
+        <div class="profile-container" id="adminProfile">
+            <!-- Profile details will be dynamically inserted here -->
+        </div>
+        <button class="reset-btn" onclick="window.location.replace('./srh_forgot_password/index.html')">Reset Password</button>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2010-2022 Privacy - Terms</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userRole = localStorage.getItem("userRole"); // Get user role from localStorage
+
+            if (userRole !== 'admin') {
+                window.location.replace('login_page.html');
+            }
+        });
+
+        // Fetch and display the super user's profile
+        async function fetchSuperUserProfile() {
+            const response = await fetch('http://localhost:3000/get_super_user');
+            const data = await response.json();
+
+            if (data.success) {
+                const adminProfile = document.getElementById('adminProfile');
+                adminProfile.innerHTML = `
+                    <div class="profile-row">
+                        <label>First Name:</label>
+                        <span>${data.data.first_name}</span>
+                    </div>
+                    <div class="profile-row">
+                        <label>Last Name:</label>
+                        <span>${data.data.last_name}</span>
+                    </div>
+                    <div class="profile-row">
+                        <label>Email:</label>
+                        <span>${data.data.email}</span>
+                    </div>
+                `;
+            } else {
+                alert('Error fetching super user profile');
+            }
+        }
+
+        // Load super user profile when the page loads
+        window.onload = fetchSuperUserProfile;
+    </script>
+</body>
+</html>

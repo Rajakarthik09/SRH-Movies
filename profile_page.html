@@ -14,7 +14,6 @@
             <div class="logo">SRH <span>Movies</span></div></a>
             <nav>
                 <a href="login_page.html" onclick="localStorage.removeItem('userEmail'); localStorage.removeItem('userRole'); sessionStorage.clear(); window.location.replace('login_page.html'); return false;">Logout</a>
-                
             </nav>
         </div>
     </header>
@@ -45,6 +44,7 @@
                         <th>Time</th>
                         <th>Seats</th>
                         <th>Status</th>
+                        <th>Price</th> <!-- Added Price Column -->
                     </tr>
                 </thead>
                 <tbody id="orderHistoryTableBody">
@@ -74,63 +74,71 @@
             const email = localStorage.getItem("userEmail");
             const userRole = localStorage.getItem("userRole"); // Get user role from localStorage
             if (userRole !== 'user') {
-            window.location.replace('login_page.html');
-            return;
-        }
-            console.log(email)
+                window.location.replace('login_page.html');
+                return;
+            }
+
             if (email) {
                 document.getElementById("profileEmail").value = email;
-                // Fetch and display bookings based on the email
                 fetchBookings(email);
                 fetch(`http://localhost:3000/get_user_info?email=${email}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const {first_name, last_name} = data.details[0];
-                        document.getElementById("firstName").value = first_name;
-                        document.getElementById("lastName").value = last_name;
-                    } else {
-                        alert("Failed to fetch details: " + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching details:", error);
-                    alert("An error occurred while fetching the profile info.");
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const { first_name, last_name } = data.details[0];
+                            document.getElementById("firstName").value = first_name;
+                            document.getElementById("lastName").value = last_name;
+                        } else {
+                            alert("Failed to fetch details: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching details:", error);
+                        alert("An error occurred while fetching the profile info.");
+                    });
             }
         });
 
         // Function to fetch bookings and update the order history table
         function fetchBookings(email) {
-            fetch(`http://localhost:3000/get_bookings?email=${email}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById('orderHistoryTableBody');
-                    tableBody.innerHTML = ''; // Clear previous rows
+    fetch(`http://localhost:3000/get_bookings?email=${email}`)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('orderHistoryTableBody');
+            tableBody.innerHTML = ''; // Clear previous rows
 
-                    if (data.success) {
-                        data.bookings.forEach((booking, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${booking.movie_name}</td>
-                                <td>${booking.day}</td>
-                                <td>${booking.time}</td>
-                                <td>${booking.seat_numbers}</td>
-                                <td>${booking.status}</td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                    } else {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `<td colspan="6" class="empty">No orders found</td>`;
-                        tableBody.appendChild(row);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching bookings:', error);
+            if (data.success) {
+                data.bookings.forEach((booking, index) => {
+                    // Check if seat_numbers is an array or a string
+                    const seatNumbers = Array.isArray(booking.seat_numbers) 
+                        ? booking.seat_numbers 
+                        : booking.seat_numbers.split(',');
+
+                    const numberOfSeats = seatNumbers.length; // Count the seats
+                    const price = numberOfSeats * 150; // Calculate the price (150 per seat)
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${booking.movie_name}</td>
+                        <td>${booking.day}</td>
+                        <td>${booking.time}</td>
+                        <td>${seatNumbers.join(', ')}</td> <!-- Display seat numbers -->
+                        <td>${booking.status}</td>
+                        <td>Rs. ${price}</td> <!-- Display the calculated price -->
+                    `;
+                    tableBody.appendChild(row);
                 });
-        }
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" class="empty">No orders found</td>`;
+                tableBody.appendChild(row);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching bookings:', error);
+        });
+}
 
         // Handle form submission to update profile
         const profileForm = document.getElementById("profileForm");
@@ -142,11 +150,10 @@
             const lastName = document.getElementById("lastName").value;
             const password = document.getElementById("password").value;
             const email = document.getElementById("profileEmail").value;
-            const existingPassword = localStorage.getItem("userPassword"); // Assume this is how you get the existing password
+            const existingPassword = localStorage.getItem("userPassword");
 
-            // If the password field is empty, use the existing password
             const passwordToUpdate = password ? password : existingPassword;
-            // Create an object with the updated data
+
             const updatedData = {
                 firstName: firstName,
                 lastName: lastName,
@@ -154,7 +161,6 @@
                 email: email,
             };
 
-            // Send the updated data to the backend (PUT request)
             fetch("http://localhost:3000/update_profile", {
                 method: "PUT",
                 headers: {
