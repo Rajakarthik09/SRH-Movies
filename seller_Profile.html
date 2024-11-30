@@ -32,7 +32,7 @@
 
                     <label>Email</label>
                     <input type="email" id="profileEmail" readonly >
-
+                    <a href='./srh_forgot_password/index.html'>Change Password</a>
                     <button type="submit" id="save_changes" class="save-changes">Save Changes</button>
                 </form>
             </div>
@@ -49,6 +49,7 @@
                         <th>Movie Name</th>
                         <th>Date</th>
                         <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody id="movieTableBody">
@@ -157,11 +158,12 @@
                         data.movies.forEach((movie, index) => {
                             const row = `
                                 <tr>
-                                    <td>${index + 1}</td>
+                                    <td>${movie.id}</td>
                                     <td>${movie.genre}</td>
                                     <td>${movie.name}</td>
                                     <td>${movie.release_date}</td>
                                     <td><button onclick="editMovie('${movie.name}')">Edit</button></td>
+                                    <td><button onclick="deleteMovie(${movie.movie_id}, '${movie.name}')">Delete</button></td>
                                 </tr>`;
                             tableBody.innerHTML += row;
                         });
@@ -171,7 +173,29 @@
                 })
                 .catch(error => console.error("Error fetching movies:", error));
         }
-
+        function deleteMovie(movieId, movieName) {
+    if (confirm(`Are you sure you want to delete the movie "${movieName}"?`)) {
+        // Send a DELETE request to the backend
+        fetch(`http://localhost:3000/delete_movie?movie_id=${movieId}`, {
+            method: "DELETE",
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Movie "${movieName}" deleted successfully.`);
+                    // Refresh the movie list
+                    const email = localStorage.getItem("userEmail");
+                    fetchMovies(email);
+                } else {
+                    alert(`Failed to delete the movie: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting the movie:", error);
+                alert("An error occurred while deleting the movie.");
+            });
+    }
+}
         function editMovie(movieName) {
             window.location.href = `seller_edit_profile.html?name=${movieName}`;
         }

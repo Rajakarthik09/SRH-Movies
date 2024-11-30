@@ -178,3 +178,8 @@ footer {
     color: #777;
     margin-top: 5px;
 }
+a{
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+}

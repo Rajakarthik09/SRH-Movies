@@ -145,3 +145,8 @@ footer {
 .footer-links .logo {
     font-weight: bold;
 }
+a{
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+}

@@ -40,6 +40,9 @@
       <label for="release-date">Release Date</label>
       <input type="text" id="release-date">
 
+      <label for="image_path">Image Path</label>
+      <input type="text" id="image-path">
+
       <h2>Showtimes</h2>
       <table id="showtimes-table">
         <thead>
@@ -73,8 +76,9 @@ const urlParams = new URLSearchParams(window.location.search);
 
           document.getElementById('movie-name').value = movieDetails.name;
           document.getElementById('description').value = movieDetails.description;
-          document.getElementById('release-date').value = formatDate(movieDetails.release_date); // Format the release date
+          document.getElementById('release-date').value = formatDate(movieDetails.release_date);
           document.getElementById('genre').value = movieDetails.genre;
+          document.getElementById('image-path').value = movieDetails.image;
 
           const tableBody = document.querySelector("#showtimes-table tbody");
           tableBody.innerHTML = '';
@@ -132,7 +136,8 @@ const urlParams = new URLSearchParams(window.location.search);
         name: document.getElementById('movie-name').value,
         description: document.getElementById('description').value,
         release_date: document.getElementById('release-date').value,
-        genre: document.getElementById('genre').value
+        genre: document.getElementById('genre').value,
+        image: document.getElementById('image-path').value
       };
 
       // Fix the issue: accessing 'select' instead of 'input' for time

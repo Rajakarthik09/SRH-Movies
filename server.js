@@ -274,7 +274,7 @@ app.get('/get_movie_details', (req, res) => {
     }
   
     const movieQuery = `
-      SELECT name, description, release_date, genre 
+      SELECT name, description, release_date, genre, image 
       FROM movies 
       WHERE name = ?;
     `;
@@ -419,6 +419,37 @@ app.post("/add_movies", (req, res) => {
     });
 });
 
+app.delete('/delete_movie', async (req, res) => {
+    const { movie_id } = req.query;
+
+    // Check if movie_id is provided
+    if (!movie_id) {
+        return res.status(400).json({ success: false, message: 'Movie ID is required.' });
+    }
+
+    const deleteQuery = `
+        DELETE movies, showtimes 
+        FROM movies 
+        LEFT JOIN showtimes ON movies.id = showtimes.movie_id 
+        WHERE movies.id = ?;
+    `;
+
+    try {
+        // Use promise-based query execution
+        const [result] = await db.promise().query(deleteQuery, [movie_id]);
+
+        // Check affected rows
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Movie and related showtimes deleted successfully.' });
+        } else {
+            res.json({ success: false, message: 'Movie not found or already deleted.' });
+        }
+    } catch (error) {
+        console.error('Error deleting movie:', error);
+        res.status(500).json({ success: false, message: 'An error occurred while deleting the movie.' });
+    }
+});
+
 // PUT endpoint to update movie details and showtimes
 app.put('/update_movie_details', (req, res) => {
     const { movie, showtimes } = req.body;
@@ -441,7 +472,7 @@ app.put('/update_movie_details', (req, res) => {
     // Query to update the movie details
     const updateMovieQuery = `
         UPDATE movies 
-        SET description = ?, release_date = ?, genre = ? 
+        SET description = ?, release_date = ?, genre = ? , image = ?
         WHERE name = ?;
     `;
 
@@ -458,7 +489,7 @@ app.put('/update_movie_details', (req, res) => {
     `;
 
     // Start updating the movie details
-    db.query(updateMovieQuery, [movie.description, formattedDate, movie.genre, movie.name], (err) => {
+    db.query(updateMovieQuery, [movie.description, formattedDate, movie.genre, movie.image, movie.name], (err) => {
         if (err) {
             console.error('Error updating movie details:', err);
             return res.status(500).json({ success: false, message: 'Failed to update movie details' });
@@ -677,11 +708,11 @@ app.post('/signup_seller', (req, res) => {
 });
 
 app.put('/update_seller', (req, res) => {
-    const { email, firstName, lastName, password } = req.body; // Take email and other details for updating
+    const { email, firstName, lastName } = req.body; // Take email and other details for updating
 
-    const query = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE email = ? AND role = "seller"';
+    const query = 'UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE email = ? AND role = "seller"';
 
-    db.query(query, [firstName, lastName, email, password, email], (err, results) => {
+    db.query(query, [firstName, lastName, email, email], (err, results) => {
         if (err) {
             console.error('Error updating seller:', err);
             return res.status(500).json({ success: false, message: 'Database error' });

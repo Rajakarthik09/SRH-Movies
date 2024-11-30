@@ -115,7 +115,7 @@
                 <label>E-mail</label>
                 <input type="email" id="email" placeholder="Please enter seller email">
             </div>
-            <div class="form-group">
+            <div class="form-group" id ="passwordDiv">
                 <label>Password</label>
                 <input type="password" id="password" placeholder="Please enter seller password">
             </div>
@@ -176,6 +176,7 @@ async function addSeller() {
         fetchSellers(); // Refresh the sellers list
         clearForm(); // Clear the form fields
         showAddButton(); // Show the Add button after clearing the form
+        showPassword();
     } else {
         alert('Error adding seller');
     }
@@ -214,10 +215,10 @@ async function editSeller(email) {
         document.getElementById('firstName').value = data.data.first_name;
         document.getElementById('lastName').value = data.data.last_name;
         document.getElementById('email').value = data.data.email;
-        document.getElementById('password').value = ''; // Do not populate the password field
 
         currentSellerEmail = email; // Store the current seller email for update
         currentMode = 'edit'; // Switch to edit mode
+        hidePassword();
         showUpdateButton(); // Show the Update button, hide the Add button
         showCancelButton(); // Show the Cancel button
     } else {
@@ -230,7 +231,6 @@ async function updateSeller() {
     const email = document.getElementById('email').value;
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
-    const password = document.getElementById('password').value;
 
     // If the password is empty, do not include it in the update request
     const updateData = {
@@ -255,6 +255,7 @@ async function updateSeller() {
         fetchSellers(); // Refresh the sellers list
         clearForm(); // Clear the form fields
         showAddButton(); // Show the Add button after update
+        showPassword();
     } else {
         alert('Error updating seller');
     }
@@ -311,11 +312,19 @@ function showCancelButton() {
     document.getElementById('cancelBtn').style.display = 'inline-block'; // Show Cancel button
 }
 
+function hidePassword(){
+    document.getElementById("passwordDiv").style.display = 'none';
+}
+
+function showPassword(){
+    document.getElementById("passwordDiv").style.display = "block";
+}
 // Function to reset form and go back to Add Seller mode
 function resetForm() {
     clearForm(); // Clear all form fields
     currentMode = 'add'; // Switch to add mode
     showAddButton(); // Show the Add Seller button
+    showPassword();
 }
     </script>
 </body>
